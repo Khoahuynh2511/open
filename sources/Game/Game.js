@@ -1,7 +1,6 @@
 import Debug from '@/Debug/Debug.js'
 import State from '@/State/State.js'
 import View from '@/View/View.js'
-
 export default class Game
 {
     static instance
