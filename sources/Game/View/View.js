@@ -82,6 +82,9 @@ export default class View
         directionalLight.position.set(5, 10, 7.5);
         this.scene.add(directionalLight);
         
+        // Thêm lighting để model GLTF không bị đen
+        this.setupLighting()
+        
         this.camera = new Camera()
         this.audioListener = new THREE.AudioListener();
         this.camera.instance.add(this.audioListener);
@@ -280,6 +283,22 @@ export default class View
             }
         }
         return true; // Area is considered flat enough
+    }
+
+    setupLighting()
+    {
+        // Ambient light - ánh sáng môi trường để model không bị đen hoàn toàn
+        this.ambientLight = new THREE.AmbientLight('#ffffff', 0.6) // Soft white light
+        this.scene.add(this.ambientLight)
+
+        // Directional light - mô phỏng ánh mặt trời
+        this.directionalLight = new THREE.DirectionalLight('#ffffff', 0.8)
+        this.directionalLight.position.set(-0.5, 1, -0.5) // Tương ứng với uSunPosition
+        this.directionalLight.target.position.set(0, 0, 0)
+        this.scene.add(this.directionalLight)
+        this.scene.add(this.directionalLight.target)
+
+        console.log('✨ Lighting system initialized for GLTF models')
     }
 
     resize()

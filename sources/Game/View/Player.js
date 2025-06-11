@@ -5,6 +5,9 @@ import View from '@/View/View.js'
 import Debug from '@/Debug/Debug.js'
 import State from '@/State/State.js'
 import PlayerMaterial from './Materials/PlayerMaterial.js'
+import CharacterManager from './CharacterManager.js'
+import CharacterUI from './CharacterUI.js'
+import CharacterEffects from './CharacterEffects.js'
 
 export default class Player
 {
@@ -16,11 +19,14 @@ export default class Player
         this.debug = Debug.getInstance()
 
         this.scene = this.view.scene
+        this.characterManager = new CharacterManager()
+        this.characterEffects = new CharacterEffects(this.scene)
 
         this.setGroup()
         this.setHelper()
         this.setJumpEffects()
         this.setDebug()
+        this.setCharacterUI()
     }
 
     setGroup()
@@ -31,14 +37,7 @@ export default class Player
     
     setHelper()
     {
-        this.helper = new THREE.Mesh()
-        this.helper.material = new PlayerMaterial()
-        this.helper.material.uniforms.uColor.value = new THREE.Color('#fff8d6')
-        this.helper.material.uniforms.uSunPosition.value = new THREE.Vector3(- 0.5, - 0.5, - 0.5)
-
-        this.helper.geometry = new THREE.CapsuleGeometry(0.5, 0.8, 3, 16),
-        this.helper.geometry.translate(0, 0.9, 0)
-        this.group.add(this.helper)
+        this.createCharacterMesh()
 
         // const arrow = new THREE.Mesh(
         //     new THREE.ConeGeometry(0.2, 0.2, 4),
@@ -54,15 +53,185 @@ export default class Player
         // this.group.add(this.axisHelper)
     }
 
+    async createCharacterMesh()
+    {
+        // Remove old mesh if exists
+        if (this.helper) {
+            this.group.remove(this.helper)
+            if (this.helper.geometry) this.helper.geometry.dispose()
+            if (this.helper.material) this.helper.material.dispose()
+        }
+
+        // Get current character data
+        const characterData = this.characterManager.getCharacterData()
+        
+        // Check if it's a model (online or local)
+        if (characterData.isOnlineModel || characterData.isLocalModel) {
+            try {
+                console.log(`🔄 Loading model: ${characterData.name}`)
+                console.log(`📋 Model config:`, {
+                    isLocalModel: characterData.isLocalModel,
+                    modelPath: characterData.modelPath,
+                    scale: characterData.scale,
+                    color: characterData.color
+                })
+                
+                // Increase timeout for large models like Jaekelopterus
+                const timeoutDuration = characterData.modelPath?.includes('Jaekelopterus') ? 15000 : 8000
+                
+                // Race between model loading and timeout
+                const timeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error(`Timeout after ${timeoutDuration}ms`)), timeoutDuration)
+                })
+                
+                let modelResult
+                if (characterData.isLocalModel) {
+                    // Load local model
+                    console.log(`📁 Loading local model from: ${characterData.modelPath}`)
+                    modelResult = await Promise.race([
+                        this.characterManager.modelLoader.loadLocalModel(characterData.modelPath, characterData.name),
+                        timeoutPromise
+                    ])
+                } else {
+                    // Load online model (original code)
+                    modelResult = await Promise.race([
+                        this.characterManager.modelLoader.createModelGeometry(characterData.modelKey),
+                        timeoutPromise
+                    ])
+                }
+                
+                if (modelResult && modelResult.isModel) {
+                    // Use 3D model
+                    this.helper = modelResult.object
+                    this.helper.scale.set(characterData.scale.x, characterData.scale.y, characterData.scale.z)
+                    
+                    console.log(`📏 Applied scale:`, characterData.scale)
+                    console.log(`📦 Model bounding box:`, new THREE.Box3().setFromObject(this.helper))
+                    
+                    // Debug preserveOriginalColor flag
+                    console.log(`🎨 preserveOriginalColor flag:`, characterData.preserveOriginalColor)
+                    
+                    // Traverse through all meshes to apply color (optional)
+                    if (!characterData.preserveOriginalColor) {
+                        try {
+                            console.log(`🎨 Applying custom color: ${characterData.color}`)
+                            this.helper.traverse((child) => {
+                                if (child.isMesh && child.material) {
+                                    console.log(`🎨 Applying color to mesh: ${child.name || 'unnamed'}`)
+                                    
+                                    // Create new material with selected color instead of just setting color
+                                    const newMaterial = new THREE.MeshLambertMaterial({
+                                        color: characterData.color,
+                                        transparent: false
+                                    })
+                                    
+                                    // If old material has texture, copy texture
+                                    if (Array.isArray(child.material)) {
+                                        child.material = child.material.map(mat => {
+                                            const newMat = newMaterial.clone()
+                                            if (mat.map) newMat.map = mat.map
+                                            if (mat.normalMap) newMat.normalMap = mat.normalMap
+                                            return newMat
+                                        })
+                                    } else {
+                                        const newMat = newMaterial.clone()
+                                        if (child.material.map) newMat.map = child.material.map
+                                        if (child.material.normalMap) newMat.normalMap = child.material.normalMap
+                                        child.material = newMat
+                                    }
+                                }
+                            })
+                        } catch (colorError) {
+                            console.warn('Could not apply color to model:', colorError)
+                        }
+                    } else {
+                        console.log(`🌈 Preserving original model colors`)
+                    }
+                    
+                    this.group.add(this.helper)
+                    console.log(`✅ Successfully loaded and added to scene: ${characterData.name}`)
+                    return
+                }
+            } catch (error) {
+                console.error(`❌ Failed to load model: ${characterData.name}`, error)
+                console.log('📝 Error details:', {
+                    message: error.message,
+                    stack: error.stack,
+                    modelPath: characterData.modelPath
+                })
+                // Fallback will be executed below
+            }
+        }
+        
+        // Fallback: Create mesh from geometry
+        let geometry
+        
+        // If it's a model (online/local) and has fallback geometry, use fallback
+        if ((characterData.isOnlineModel || characterData.isLocalModel) && characterData.fallbackGeometry) {
+            console.log(`🔄 Using fallback geometry for: ${characterData.name}`)
+            geometry = characterData.fallbackGeometry()
+        } else if (characterData.geometry) {
+            // Use standard geometry
+            geometry = characterData.geometry()
+        } else {
+            // Default fallback
+            console.warn(`⚠️ No geometry found, using default capsule`)
+            geometry = new THREE.CapsuleGeometry(0.5, 0.8, 3, 16)
+            geometry.translate(0, 0.9, 0)
+        }
+        
+        // Check if geometry returns a Group (like new Son Goku)
+        if (geometry instanceof THREE.Group) {
+            this.helper = geometry
+        } else {
+            // Standard geometry
+            this.helper = new THREE.Mesh()
+            this.helper.material = new PlayerMaterial()
+            this.helper.material.uniforms.uColor.value = new THREE.Color(characterData.color)
+            this.helper.material.uniforms.uSunPosition.value = new THREE.Vector3(- 0.5, - 0.5, - 0.5)
+            this.helper.geometry = geometry
+        }
+        
+        this.helper.scale.set(characterData.scale.x, characterData.scale.y, characterData.scale.z)
+        this.group.add(this.helper)
+    }
+
+    async changeCharacter(characterType)
+    {
+        if (this.characterManager.setCharacterType(characterType)) {
+            // Remove old effects
+            this.characterEffects.removeAllEffects(this.helper)
+            
+            // Create new mesh (async)
+            await this.createCharacterMesh()
+            
+            // Add effects for special characters
+            this.characterEffects.addAura(this.helper, characterType)
+            
+            return true
+        }
+        return false
+    }
+
+    getAvailableCharacters()
+    {
+        return this.characterManager.getAvailableCharacters()
+    }
+
+    setCharacterUI()
+    {
+        this.characterUI = new CharacterUI(this)
+    }
+
     setJumpEffects()
     {
-        // Scale animation when jumping
+        // Add effects for jumping
         this.jumpScale = {
             min: 0.9,
             max: 1.15
         }
         
-        // Dust effect when landing
+        // Create dust effect when landing
         this.dustGeometry = new THREE.CircleGeometry(1, 12)
         this.dustGeometry.rotateX(-Math.PI / 2)
         
@@ -106,9 +275,26 @@ export default class Player
             playerState.position.current[2]
         )
         
-        // Helper
-        this.helper.rotation.y = playerState.rotation
-        this.helper.material.uniforms.uSunPosition.value.set(sunState.position.x, sunState.position.y, sunState.position.z)
+        // Quay model theo hướng di chuyển
+        if (this.helper) {
+            // Đối với model 3D GLTF, có thể cần điều chỉnh hướng
+            const characterData = this.characterManager.getCharacterData()
+            
+            if (characterData.isLocalModel || characterData.isOnlineModel) {
+                // Sử dụng rotationOffset từ config model
+                const rotationOffset = characterData.rotationOffset || Math.PI
+                this.helper.rotation.y = playerState.rotation + rotationOffset
+                // console.log(`🔄 Rotating 3D model: ${(playerState.rotation * 180 / Math.PI).toFixed(1)}° + offset: ${(rotationOffset * 180 / Math.PI).toFixed(1)}°`)
+            } else {
+                // Geometry thông thường
+                this.helper.rotation.y = playerState.rotation
+            }
+        }
+        
+        // Chỉ update material nếu không phải là 3D model
+        if (this.helper.material && this.helper.material.uniforms) {
+            this.helper.material.uniforms.uSunPosition.value.set(sunState.position.x, sunState.position.y, sunState.position.z)
+        }
         
         // Jump effect
         if(playerState.isJumping)
@@ -130,8 +316,9 @@ export default class Player
         }
         else
         {
-            // Back to normal size when not jumping
-            this.helper.scale.set(1, 1, 1)
+            // Về kích thước bình thường khi không nhảy
+            const characterData = this.characterManager.getCharacterData()
+            this.helper.scale.set(characterData.scale.x, characterData.scale.y, characterData.scale.z)
             
             // Show dust effect when landing
             if(this.isShowingDust)
@@ -156,5 +343,8 @@ export default class Player
                 }
             }
         }
+
+        // Cập nhật hiệu ứng nhân vật đặc biệt
+        this.characterEffects.update(this.state.time.delta, this.helper)
     }
 }
