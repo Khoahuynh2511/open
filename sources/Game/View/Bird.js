@@ -2,14 +2,11 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 export default class Bird {
-    constructor(scene, time, initialPosition, audioListener, enableSound) { 
+    constructor(scene, time, initialPosition) { 
         console.log('[Bird.js] Constructor started for bird at', initialPosition);
         this.scene = scene;
         this.time = time;
         this.initialPosition = initialPosition.clone();
-        this.audioListener = audioListener;
-        this.sound = null;
-        this.enableSoundOnLoad = enableSound;
 
         this.gltfLoader = new GLTFLoader()
         this.mixer = null
@@ -34,7 +31,7 @@ export default class Bird {
             (gltf) => {
                 console.log('[Bird.js] Model loaded successfully:', gltf); 
                 this.model = gltf.scene
-                this.model.scale.set(0.5, 0.5, 0.5)
+                this.model.scale.set(1, 1, 1)
                 this.model.position.copy(this.initialPosition); 
                 this.scene.add(this.model)
                 console.log('[Bird.js] Model added to scene at', this.initialPosition);
@@ -70,14 +67,9 @@ export default class Bird {
                         console.log('[Bird.js] Playing default (first) animation for bird at', this.initialPosition.x.toFixed(2));
                     }
                     const action = this.mixer.clipAction(actionToPlay)
-                    action.timeScale = 10;
                     action.play()
                 } else {
                     console.log('[Bird.js] No animations found in model');
-                }
-
-                if (this.enableSoundOnLoad) {
-                    this.enableSound();
                 }
             },
             undefined,
@@ -85,48 +77,6 @@ export default class Bird {
                 console.error('[Bird.js] An error happened while loading the bird model for bird at', this.initialPosition.x.toFixed(2), error)
             }
         )
-    }
-
-    addSound() {
-        if (!this.audioListener) return;
-        const audioLoader = new THREE.AudioLoader();
-        this.sound = new THREE.PositionalAudio(this.audioListener);
-        audioLoader.load('/sounds/bird.mp3', (buffer) => {
-            this.sound.setBuffer(buffer);
-            this.sound.setRefDistance(10);
-            this.sound.setLoop(true);
-            this.sound.setVolume(this.initialVolume);
-            this.sound.play();
-        });
-        this.model.add(this.sound);
-    }
-
-    enableSound() {
-        console.log('[Bird.js] enableSound called');
-        if (this.sound) {
-            this.model.remove(this.sound);
-            this.sound.stop();
-            this.sound = null;
-        }
-        if (!this.audioListener) return;
-        const audioLoader = new THREE.AudioLoader();
-        this.sound = new THREE.PositionalAudio(this.audioListener);
-        audioLoader.load('/sounds/bird.mp3', (buffer) => {
-            this.sound.setBuffer(buffer);
-            this.sound.setRefDistance(10);
-            this.sound.setLoop(true);
-            this.sound.setVolume(1);
-            this.sound.play();
-        });
-        this.model.add(this.sound);
-    }
-
-    disableSound() {
-        if (this.sound) {
-            this.sound.stop();
-            this.model.remove(this.sound);
-            this.sound = null;
-        }
     }
 
     update() {

@@ -2,14 +2,12 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 export default class Cow {
-    constructor(scene, time, initialPosition, audioListener, enableSound) {
+    constructor(scene, time, initialPosition) {
         console.log('[Cow.js] Constructor started for cow at', initialPosition);
         this.scene = scene;
         this.time = time;
         this.initialPosition = initialPosition;
-        this.audioListener = audioListener;
-        this.sound = null;
-        this.enableSoundOnLoad = enableSound;
+
         this.gltfLoader = new GLTFLoader()
         this.mixer = null
         this.model = null
@@ -25,7 +23,7 @@ export default class Cow {
             (gltf) => {
                 console.log('[Cow.js] Model loaded successfully:', gltf);
                 this.model = gltf.scene
-                this.model.scale.set(0.7, 0.7, 0.7)
+                this.model.scale.set(0.8, 0.8, 0.8)
                 this.model.position.copy(this.initialPosition);
                 this.model.rotation.y = Math.random() * Math.PI * 2;
                 this.scene.add(this.model)
@@ -48,15 +46,10 @@ export default class Cow {
                     console.log('[Cow.js] Animations found:', gltf.animations);
                     this.mixer = new THREE.AnimationMixer(this.model)
                     const action = this.mixer.clipAction(gltf.animations[0])
-                    action.timeScale = 0.5;
                     action.play()
                     console.log('[Cow.js] Animation started');
                 } else {
                     console.log('[Cow.js] No animations found in model');
-                }
-
-                if (this.enableSoundOnLoad) {
-                    this.enableSound();
                 }
             },
             undefined,
@@ -64,34 +57,6 @@ export default class Cow {
                 console.error('[Cow.js] An error happened while loading the cow model:', error)
             }
         )
-    }
-
-    enableSound() {
-        console.log('[Cow.js] enableSound called');
-        if (this.sound) {
-            this.model.remove(this.sound);
-            this.sound.stop();
-            this.sound = null;
-        }
-        if (!this.audioListener) return;
-        const audioLoader = new THREE.AudioLoader();
-        this.sound = new THREE.PositionalAudio(this.audioListener);
-        audioLoader.load('/sounds/cow.mp3', (buffer) => {
-            this.sound.setBuffer(buffer);
-            this.sound.setRefDistance(10);
-            this.sound.setLoop(true);
-            this.sound.setVolume(1);
-            this.sound.play();
-        });
-        this.model.add(this.sound);
-    }
-
-    disableSound() {
-        if (this.sound) {
-            this.sound.stop();
-            this.model.remove(this.sound);
-            this.sound = null;
-        }
     }
 
     update() {
