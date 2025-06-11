@@ -17,7 +17,10 @@ export default function TerrainMaterial()
             uSunPosition: { value: null },
             uFogTexture: { value: null },
             uGrassDistance: { value: null },
-            uTexture: { value: null }
+            uTexture: { value: null },
+            uMountainTexture: { value: null },
+            uMountainElevationThreshold: { value: null },
+            uMountainTransitionSmoothness: { value: null }
         },
         vertexShader: vertexShader,
         fragmentShader: fragmentShader

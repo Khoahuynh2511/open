@@ -193,6 +193,18 @@ export default class Player
         }
         
         this.helper.scale.set(characterData.scale.x, characterData.scale.y, characterData.scale.z)
+        
+        // Enable shadow casting for player
+        if (this.helper instanceof THREE.Group) {
+            this.helper.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true
+                }
+            })
+        } else if (this.helper.isMesh) {
+            this.helper.castShadow = true
+        }
+        
         this.group.add(this.helper)
     }
 

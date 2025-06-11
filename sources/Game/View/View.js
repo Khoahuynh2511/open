@@ -299,10 +299,22 @@ export default class View
         this.ambientLight = new THREE.AmbientLight('#ffffff', 0.6) // Soft white light
         this.scene.add(this.ambientLight)
 
-        // Directional light - mô phỏng ánh mặt trời
+        // Directional light - mô phỏng ánh mặt trời với shadows
         this.directionalLight = new THREE.DirectionalLight('#ffffff', 0.8)
         this.directionalLight.position.set(-0.5, 1, -0.5) // Tương ứng với uSunPosition
         this.directionalLight.target.position.set(0, 0, 0)
+        
+        // Enable shadows for sun light
+        this.directionalLight.castShadow = true
+        this.directionalLight.shadow.mapSize.width = 2048  // Shadow quality
+        this.directionalLight.shadow.mapSize.height = 2048
+        this.directionalLight.shadow.camera.near = 0.5
+        this.directionalLight.shadow.camera.far = 50
+        this.directionalLight.shadow.camera.left = -25
+        this.directionalLight.shadow.camera.right = 25
+        this.directionalLight.shadow.camera.top = 25
+        this.directionalLight.shadow.camera.bottom = -25
+        
         this.scene.add(this.directionalLight)
         this.scene.add(this.directionalLight.target)
 
@@ -339,12 +351,24 @@ export default class View
 
     update()
     {
+        // Performance monitoring disabled
+        // const startTime = performance.now()
+        
         this.sky.update()
         this.water.update()
         this.terrains.update()
         this.chunks.update()
         this.player.update()
         this.grass.update()
+
+        
+
+        
+        // Performance monitoring disabled
+        // const endTime = performance.now()
+        // if (endTime - startTime > 16) { // More than 16ms = bad performance
+        //     console.warn(`🐌 Slow frame: ${(endTime - startTime).toFixed(2)}ms`)
+        // }
 
         if (this.enableRain && this.rainEffect) this.rainEffect.update()
 

@@ -7,6 +7,9 @@ uniform vec3 uSunPosition;
 uniform float uGrassDistance;
 uniform sampler2D uTexture;
 uniform sampler2D uFogTexture;
+uniform sampler2D uMountainTexture;
+uniform float uMountainElevationThreshold;
+uniform float uMountainTransitionSmoothness;
 
 varying vec3 vColor;
 
@@ -48,7 +51,20 @@ void main()
     float grassAttenuation = grassDistanceAttenuation * grassSlopeAttenuation;
     vec3 grassColor = mix(uGrassShadedColor, uGrassDefaultColor, 1.0 - grassAttenuation);
 
-    vec3 color = grassColor;
+    // Mountain texture blending based on elevation
+    vec2 mountainUv = modelPosition.xz * 0.02; // Scale UV for mountain texture
+    vec3 mountainColor = texture2D(uMountainTexture, mountainUv).rgb;
+    
+    // Calculate elevation factor for mountain texture
+    float elevation = modelPosition.y;
+    float elevationFactor = smoothstep(
+        uMountainElevationThreshold,
+        uMountainElevationThreshold + uMountainTransitionSmoothness,
+        elevation
+    );
+    
+    // Blend between grass and mountain based on elevation
+    vec3 color = mix(grassColor, mountainColor, elevationFactor);
 
     // Sun shade
     float sunShade = getSunShade(normal);
