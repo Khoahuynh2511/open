@@ -314,7 +314,7 @@ export default class View
         const debug = Debug.getInstance()
         if (!debug.active) return
 
-        const folder = debug.ui.getFolder('View/Weather')
+        const folder = debug.ui.getFolder('environment/weather')
         folder.add(this, 'enableRain')
             .name('Enable Rain')
             .onChange((value) => this.toggleRain(value))
@@ -382,7 +382,7 @@ export default class View
     }
 
     setDebug() {
-        const animalsFolder = this.debug.ui.getFolder('view/animals');
+        const animalsFolder = this.debug.ui.getFolder('environment/animals');
 
         // Spawn Range
         const spawnRangeFolder = animalsFolder.addFolder('spawn range');

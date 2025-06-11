@@ -111,7 +111,7 @@ export default class SoundManager
         if(!this.debug.active)
             return
             
-        const soundFolder = this.debug.ui.getFolder('audio')
+        const soundFolder = this.debug.ui.getFolder('audio/sound')
         
         soundFolder.add(this, 'masterVolume', 0, 1, 0.01)
             .name('Master volume')

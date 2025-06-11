@@ -78,7 +78,7 @@ export default class Camera
         if(!debug.active)
             return
 
-        const folder = debug.ui.getFolder('state/player/view')
+        const folder = debug.ui.getFolder('state/camera')
 
         folder
             .add(

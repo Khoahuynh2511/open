@@ -34,7 +34,7 @@ export default class DayCycle
         if(!this.debug.active)
             return
 
-        const folder = this.debug.ui.getFolder('state/dayCycle')
+        const folder = this.debug.ui.getFolder('state/day-cycle')
 
         folder
             .add(this, 'autoUpdate')

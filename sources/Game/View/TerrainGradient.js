@@ -61,7 +61,7 @@ export default class TerrainGradient
         if(!debug.active)
             return
 
-        const folder = debug.ui.getFolder('view/terrains/gradient')
+        const folder = debug.ui.getFolder('rendering/terrain/gradient')
 
         for(const colorKey in this.colors)
         {

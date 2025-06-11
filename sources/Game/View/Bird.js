@@ -13,12 +13,12 @@ export default class Bird {
         this.model = null
 
         // Movement parameters
-        this.flyRadius = 10 + Math.random() * 5;
-        this.angularSpeed = 0.0002 + Math.random() * 0.0003;
+        this.flyRadius = 100 + Math.random() * 5;
+        this.angularSpeed = 0.0008 + Math.random() * 0.0012;
         this.currentAngle = Math.random() * Math.PI * 2;
         this.baseY = this.initialPosition.y;
         this.verticalOscillationAmplitude = 1 + Math.random() * 1;
-        this.verticalOscillationSpeed = 0.0005 + Math.random() * 0.0005;
+        this.verticalOscillationSpeed = 0.0005 + Math.random() * 0.5;
 
         this.loadModel()
         console.log('[Bird.js] Constructor finished, loadModel called');

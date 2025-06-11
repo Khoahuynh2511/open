@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import Game from '@/Game.js'
 import View from '@/View/View.js'
 import State from '@/State/State.js'
+import Debug from '@/Debug/Debug.js'
 import GrassMaterial from './Materials/GrassMaterial.js'
 
 export default class Grass
@@ -12,13 +13,16 @@ export default class Grass
         this.game = Game.getInstance()
         this.view = View.getInstance()
         this.state = State.getInstance()
+        this.debug = Debug.getInstance()
 
         this.time = this.state.time
         this.scene = this.view.scene
         this.noises = this.view.noises
 
+        // Grass render parameters
         this.details = 200
-        this.size = this.state.chunks.minSize
+        this.renderDistance = this.state.chunks.minSize * 1.5  // Render distance
+        this.size = this.renderDistance
         this.count = this.details * this.details
         this.fragmentSize = this.size / this.details
         this.bladeWidthRatio = 1.5
@@ -30,6 +34,7 @@ export default class Grass
         this.setGeometry()
         this.setMaterial()
         this.setMesh()
+        this.setDebug()
     }
 
     setGeometry()
@@ -196,5 +201,124 @@ export default class Grass
                 )
             }
         }
+    }
+
+    setDebug()
+    {
+        if(!this.debug.active)
+            return
+
+        const grassFolder = this.debug.ui.getFolder('rendering/grass')
+
+        // Render Distance
+        grassFolder.add(this, 'renderDistance', 50, 500, 10)
+            .name('Render Distance')
+            .onChange((value) => {
+                this.size = value
+                this.material.uniforms.uGrassDistance.value = value
+                console.log(`🌱 Grass render distance changed to: ${value}`)
+            })
+
+        // Details (Density)
+        grassFolder.add(this, 'details', 50, 400, 10)
+            .name('Grass Density')
+            .onChange((value) => {
+                console.log(`🌱 Grass density will change to: ${value} (requires reload)`)
+                console.log('🔄 Reloading grass geometry...')
+                this.recreateGrass(value)
+            })
+
+        // Blade properties
+        const bladeFolder = grassFolder.addFolder('Grass Blades')
+        
+        bladeFolder.add(this, 'bladeWidthRatio', 0.5, 3.0, 0.1)
+            .name('Blade Width')
+            .onChange(() => this.recreateGrass())
+
+        bladeFolder.add(this, 'bladeHeightRatio', 1.0, 8.0, 0.1)
+            .name('Blade Height')
+            .onChange(() => this.recreateGrass())
+
+        bladeFolder.add(this, 'bladeHeightRandomness', 0.0, 1.0, 0.05)
+            .name('Height Randomness')
+            .onChange(() => this.recreateGrass())
+
+        bladeFolder.add(this, 'positionRandomness', 0.0, 1.0, 0.05)
+            .name('Position Randomness')
+            .onChange(() => this.recreateGrass())
+
+        // Quick presets
+        const presetsFolder = grassFolder.addFolder('Presets')
+        
+        presetsFolder.add({
+            closeRange: () => {
+                this.renderDistance = 80
+                this.size = this.renderDistance
+                this.material.uniforms.uGrassDistance.value = this.renderDistance
+                console.log('🌱 Applied Close Range preset')
+            }
+        }, 'closeRange').name('Close Range (80)')
+
+        presetsFolder.add({
+            mediumRange: () => {
+                this.renderDistance = 150
+                this.size = this.renderDistance
+                this.material.uniforms.uGrassDistance.value = this.renderDistance
+                console.log('🌱 Applied Medium Range preset')
+            }
+        }, 'mediumRange').name('Medium Range (150)')
+
+        presetsFolder.add({
+            longRange: () => {
+                this.renderDistance = 250
+                this.size = this.renderDistance
+                this.material.uniforms.uGrassDistance.value = this.renderDistance
+                console.log('🌱 Applied Long Range preset')
+            }
+        }, 'longRange').name('Long Range (250)')
+
+        presetsFolder.add({
+            ultraRange: () => {
+                this.renderDistance = 400
+                this.size = this.renderDistance
+                this.material.uniforms.uGrassDistance.value = this.renderDistance
+                console.log('🌱 Applied Ultra Range preset')
+            }
+        }, 'ultraRange').name('Ultra Range (400)')
+
+        // Performance info
+        const infoFolder = grassFolder.addFolder('Performance Info')
+        const grassCount = this.details * this.details
+        
+        infoFolder.add({
+            totalBlades: `${grassCount.toLocaleString()} blades`
+        }, 'totalBlades').name('Total Grass Blades')
+
+        infoFolder.add({
+            triangles: `${(grassCount).toLocaleString()} triangles`
+        }, 'triangles').name('Triangles Count')
+    }
+
+    recreateGrass(newDetails = null)
+    {
+        if (newDetails) {
+            this.details = newDetails
+        }
+
+        // Update dependent values
+        this.count = this.details * this.details
+        this.fragmentSize = this.size / this.details
+
+        // Remove old mesh
+        if (this.mesh) {
+            this.scene.remove(this.mesh)
+            this.geometry.dispose()
+        }
+
+        // Recreate geometry and mesh
+        this.setGeometry()
+        this.setMesh()
+
+        console.log(`✅ Grass recreated with ${this.details}x${this.details} = ${this.count.toLocaleString()} blades`)
     }
 }

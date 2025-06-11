@@ -73,7 +73,7 @@ export default class Terrains
         if(!this.debug.active)
             return
 
-        const folder = this.debug.ui.getFolder('view/terrains')
+        const folder = this.debug.ui.getFolder('rendering/terrain')
 
         folder
             .add(this.material, 'wireframe')

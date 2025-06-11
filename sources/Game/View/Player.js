@@ -258,7 +258,7 @@ export default class Player
             return
 
         // Player folder
-        const playerFolder = this.debug.ui.getFolder('view/player')
+        const playerFolder = this.debug.ui.getFolder('rendering/player')
 
         // Character Model Selection
         const characterFolder = playerFolder.addFolder('Character Model')
