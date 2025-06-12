@@ -2,15 +2,30 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 export default class Bird {
-    constructor(scene, time, initialPosition) { 
+    constructor(scene, time, initialPosition, audioListener, enableSound, soundConfig = null) { 
         // console.log('[Bird.js] Constructor started for bird at', initialPosition);
         this.scene = scene;
         this.time = time;
         this.initialPosition = initialPosition.clone();
+        this.audioListener = audioListener;
+        this.sound = null;
+        this.enableSoundOnLoad = enableSound;
 
         this.gltfLoader = new GLTFLoader()
         this.mixer = null
         this.model = null
+
+        // Sound delay system - sử dụng soundConfig nếu có
+        if (soundConfig) {
+            this.soundDelay = soundConfig.delay.bird + Math.random() * 1000;
+            this.soundDuration = soundConfig.duration.bird;
+            this.soundConfig = soundConfig;
+        } else {
+            this.soundDelay = 2000 + Math.random() * 2000; // 2-4 giây delay (chim kêu nhiều hơn)
+            this.soundDuration = 1000; // Kêu trong 1 giây
+        }
+        this.lastSoundTime = 0;
+        this.isPlaying = false;
 
         // Enhanced movement parameters - simplified
         this.baseY = this.initialPosition.y;
@@ -138,6 +153,10 @@ export default class Bird {
                 } else {
                     console.log('[Bird.js] No animations found in model');
                 }
+                
+                if (this.enableSoundOnLoad) {
+                    this.enableSound();
+                }
             },
             undefined,
             (error) => {
@@ -146,10 +165,108 @@ export default class Bird {
         )
     }
 
+    enableSound() {
+        console.log('[Bird.js] enableSound called');
+        if (this.sound) {
+            this.model.remove(this.sound);
+            this.sound.stop();
+            this.sound = null;
+        }
+        if (!this.audioListener || !this.model) return;
+        
+        const audioLoader = new THREE.AudioLoader();
+        this.sound = new THREE.PositionalAudio(this.audioListener);
+        
+        audioLoader.load('/sounds/bird.mp3', (buffer) => {
+            this.sound.setBuffer(buffer);
+            
+            // DISABLE THREE.JS DISTANCE ATTENUATION - WE'LL HANDLE IT MANUALLY
+            this.sound.setDistanceModel('linear');
+            this.sound.setRefDistance(10000); // Very high ref distance
+            this.sound.setRolloffFactor(0);   // No automatic rolloff
+            this.sound.setMaxDistance(20000); // Very high max distance
+            
+            // Store base volume and distance settings for manual calculation
+            if (this.soundConfig) {
+                this.baseVolume = this.soundConfig.volume.bird;
+                this.effectiveDistance = this.soundConfig.refDistance.bird;
+                this.maxEffectiveDistance = this.soundConfig.maxDistance.bird;
+            } else {
+                this.baseVolume = 0.25;
+                this.effectiveDistance = 25; // Bird bay cao nên nghe xa hơn
+                this.maxEffectiveDistance = 80; // Khoảng cách xa hơn cho chim
+            }
+            
+            // Validate values
+            this.baseVolume = isFinite(this.baseVolume) && this.baseVolume > 0 ? this.baseVolume : 0.25;
+            this.effectiveDistance = isFinite(this.effectiveDistance) && this.effectiveDistance > 0 ? this.effectiveDistance : 25;
+            this.maxEffectiveDistance = isFinite(this.maxEffectiveDistance) && this.maxEffectiveDistance > this.effectiveDistance ? this.maxEffectiveDistance : this.effectiveDistance + 55;
+            
+            this.sound.setVolume(this.baseVolume); // Set initial volume
+            this.sound.setLoop(false);        // Không loop liên tục
+            
+            console.log('[Bird.js] Custom distance attenuation enabled - BaseVolume:', this.baseVolume, 'EffectiveDistance:', this.effectiveDistance, 'MaxDistance:', this.maxEffectiveDistance);
+        });
+        this.model.add(this.sound);
+    }
+
+    disableSound() {
+        if (this.sound) {
+            this.sound.stop();
+            this.model.remove(this.sound);
+            this.sound = null;
+        }
+    }
+
     update() {
         if (this.mixer) {
             const deltaTime = this.time.delta
             this.mixer.update(deltaTime)
+        }
+
+        // Manual distance attenuation for sound
+        if (this.sound && this.model && this.audioListener) {
+            const listenerPosition = this.audioListener.position || this.audioListener.parent?.position;
+            if (listenerPosition) {
+                const distance = this.model.position.distanceTo(listenerPosition);
+                
+                let volume = 0;
+                if (distance <= this.effectiveDistance) {
+                    volume = this.baseVolume;
+                } else if (distance <= this.maxEffectiveDistance) {
+                    const attenuation = 1 - ((distance - this.effectiveDistance) / (this.maxEffectiveDistance - this.effectiveDistance));
+                    volume = this.baseVolume * Math.max(0, attenuation);
+                }
+                
+                if (isFinite(volume) && volume >= 0) {
+                    this.sound.setVolume(volume);
+                }
+            }
+        }
+
+        // Sound delay system
+        if (this.sound && this.model) {
+            const currentTime = Date.now();
+            
+            if (!this.isPlaying && currentTime - this.lastSoundTime > this.soundDelay) {
+                this.sound.play();
+                this.isPlaying = true;
+                this.lastSoundTime = currentTime;
+                
+                // Dừng sau soundDuration
+                setTimeout(() => {
+                    if (this.sound && this.isPlaying) {
+                        this.sound.stop();
+                        this.isPlaying = false;
+                        // Random delay cho lần kế tiếp
+                        if (this.soundConfig) {
+                            this.soundDelay = this.soundConfig.delay.bird + Math.random() * 1000;
+                        } else {
+                            this.soundDelay = 2000 + Math.random() * 2000;
+                        }
+                    }
+                }, this.soundDuration);
+            }
         }
 
         if (this.model) {
