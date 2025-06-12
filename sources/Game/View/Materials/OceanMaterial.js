@@ -30,7 +30,7 @@ void main() {
     vNormal = normalize(normalMatrix * normal);
     vUv = uv;
 }
-`;
+`
 
 const fragmentShader = `
 uniform float uTime;
@@ -103,7 +103,7 @@ void main() {
     
     gl_FragColor = vec4(finalColor, uOpacity * fadeAlpha);
 }
-`;
+`
 
 export default function OceanMaterial() {
     const material = new THREE.ShaderMaterial({
@@ -127,7 +127,7 @@ export default function OceanMaterial() {
         fragmentShader: fragmentShader,
         transparent: true,
         side: THREE.DoubleSide
-    });
+    })
 
-    return material;
+    return material
 } 

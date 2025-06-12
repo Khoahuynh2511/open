@@ -24,35 +24,33 @@ import RainStorm from './Effects/RainStorm/rainstorm.js'
 
 import * as THREE from 'three'
 
-const MAX_SPAWN_ATTEMPTS_PER_ANIMAL = 20; // Max attempts to find a flat spot
+const MAX_SPAWN_ATTEMPTS_PER_ANIMAL = 20 // Max attempts to find a flat spot
 
-// Default flatness parameters (smaller animals)
-const DEFAULT_FLATNESS_CHECK_DISTANCE = 1.5;
-const DEFAULT_MAX_ELEVATION_DIFFERENCE = 1.0;
+// Default flatness parameters (smaller animals) - Unused constants removed
 
 // Cow-specific flatness parameters
 const COW_FLATNESS_CHECK_DISTANCE = 3 // Wider check area for cows
 const COW_MAX_ELEVATION_DIFFERENCE = 0.8  // Stricter elevation diff for cows
 
 // Panther-specific flatness parameters (ADDED)
-const PANTHER_FLATNESS_CHECK_DISTANCE = 3;
-const PANTHER_MAX_ELEVATION_DIFFERENCE = 0.8;
+const PANTHER_FLATNESS_CHECK_DISTANCE = 3
+const PANTHER_MAX_ELEVATION_DIFFERENCE = 0.8
 
 // Deer-specific flatness parameters (ADDED)
-const DEER_FLATNESS_CHECK_DISTANCE = 3;
-const DEER_MAX_ELEVATION_DIFFERENCE = 0.8;
+const DEER_FLATNESS_CHECK_DISTANCE = 3
+const DEER_MAX_ELEVATION_DIFFERENCE = 0.8
 
 // Sheep-specific flatness parameters (ADDED)
-const SHEEP_FLATNESS_CHECK_DISTANCE = 2.5;
-const SHEEP_MAX_ELEVATION_DIFFERENCE = 0.8;
+const SHEEP_FLATNESS_CHECK_DISTANCE = 2.5
+const SHEEP_MAX_ELEVATION_DIFFERENCE = 0.8
 
 // Stag-specific flatness parameters
 const STAG_FLATNESS_CHECK_DISTANCE = 3
 const STAG_MAX_ELEVATION_DIFFERENCE = 0.8
 
 // Horse-specific flatness parameters  
-const HORSE_FLATNESS_CHECK_DISTANCE = 3;
-const HORSE_MAX_ELEVATION_DIFFERENCE = 0.8;
+const HORSE_FLATNESS_CHECK_DISTANCE = 3
+const HORSE_MAX_ELEVATION_DIFFERENCE = 0.8
 
 export default class View
 {
@@ -85,18 +83,18 @@ export default class View
         })
 
         this.scene = new THREE.Scene()
-        this.scene.userData.terrainHelper = this.terrainHelper;
-        this.scene.userData.elevationIterations = stateTerrains.maxIterations;
-        this.scene.userData.view = this; // Add reference to view for camera access
+        this.scene.userData.terrainHelper = this.terrainHelper
+        this.scene.userData.elevationIterations = stateTerrains.maxIterations
+        this.scene.userData.view = this // Add reference to view for camera access
         
-        const cowModelVerticalOffset = 0.75; // Adjust this value as needed
+        const cowModelVerticalOffset = 0.75 // Adjust this value as needed
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        this.scene.add(ambientLight);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+        this.scene.add(ambientLight)
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight.position.set(5, 10, 7.5);
-        this.scene.add(directionalLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8)
+        directionalLight.position.set(5, 10, 7.5)
+        this.scene.add(directionalLight)
         
         // Add lighting to GLTF models
         this.setupLighting()
@@ -111,14 +109,14 @@ export default class View
                 this.audioListener.context.resume().then(() => {
                     // Start background music after audio context is resumed
                     if (this.backgroundMusicConfig.enabled && this.backgroundMusic && !this.backgroundMusic.isPlaying) {
-                        console.log('[View.js] Starting background music after user interaction');
-                        this.playBackgroundMusic();
+                        console.log('[View.js] Starting background music after user interaction')
+                        this.playBackgroundMusic()
                     }
-                });
+                })
             } else if (this.backgroundMusicConfig.enabled && this.backgroundMusic && !this.backgroundMusic.isPlaying) {
                 // Audio context is already running, just start the music
-                console.log('[View.js] Starting background music after user interaction');
-                this.playBackgroundMusic();
+                console.log('[View.js] Starting background music after user interaction')
+                this.playBackgroundMusic()
             }
         }
         window.addEventListener('pointerdown', tryResumeAudio, { once: true })
@@ -190,27 +188,27 @@ export default class View
         this.wolves = []
         this.stags = []
         this.horses = []
-        const elevationIterations = stateTerrains.maxIterations;
+        const elevationIterations = stateTerrains.maxIterations
 
-        const playerInitialPositionArray = game.state.player.position.current;
-        const playerInitialPos = new THREE.Vector3(playerInitialPositionArray[0], playerInitialPositionArray[1], playerInitialPositionArray[2]);
+        const playerInitialPositionArray = game.state.player.position.current
+        const playerInitialPos = new THREE.Vector3(playerInitialPositionArray[0], playerInitialPositionArray[1], playerInitialPositionArray[2])
         
-        const spawnOffsetDistance = 15;
-        let frontSpawnX = playerInitialPos.x;
-        let frontSpawnZ = playerInitialPos.z - spawnOffsetDistance;
+        const spawnOffsetDistance = 15
+        let frontSpawnX = playerInitialPos.x
+        let frontSpawnZ = playerInitialPos.z - spawnOffsetDistance
 
-        let yCowFront = this.terrainHelper.getElevation(frontSpawnX, frontSpawnZ, elevationIterations);
-        const cowFrontPosition = new THREE.Vector3(frontSpawnX, yCowFront, frontSpawnZ);
-        console.log(`[View.js] About to create special Cow at`, cowFrontPosition);
-        const specialCow = new Cow(this.scene, game.state.time, cowFrontPosition, this.audioListener, true, this.soundConfig);
-        this.cows.push(specialCow);
-        console.log(`[View.js] Special Cow created successfully`);
+        let yCowFront = this.terrainHelper.getElevation(frontSpawnX, frontSpawnZ, elevationIterations)
+        const cowFrontPosition = new THREE.Vector3(frontSpawnX, yCowFront, frontSpawnZ)
+        console.log('[View.js] About to create special Cow at', cowFrontPosition)
+        const specialCow = new Cow(this.scene, game.state.time, cowFrontPosition, this.audioListener, true, this.soundConfig)
+        this.cows.push(specialCow)
+        console.log('[View.js] Special Cow created successfully')
         
         // Expose cow for debugging
-        window.debugCow = specialCow;
+        window.debugCow = specialCow
         
         // Expose background music for debugging
-        window.debugBackgroundMusic = this;
+        window.debugBackgroundMusic = this
         
         // Expose player speed controls for debugging
         window.speedBoost = {
@@ -218,8 +216,8 @@ export default class View
             disable: () => game.state.player.disableTurboBoost(),
             toggle: () => game.state.player.toggleTurboBoost(),
             setMultiplier: (value) => {
-                game.state.player.speedMultiplier = value;
-                console.log(`Speed multiplier set to: ${value}x`);
+                game.state.player.speedMultiplier = value
+                console.log(`Speed multiplier set to: ${value}x`)
             },
             info: () => {
                 console.log('Player Speed Info:', {
@@ -227,26 +225,26 @@ export default class View
                     turboBoostActive: game.state.player.turboBoostActive,
                     inputSpeed: game.state.player.inputSpeed,
                     inputBoostSpeed: game.state.player.inputBoostSpeed
-                });
+                })
             }
-        };
+        }
 
         // Enhanced sound debug commands
         window.soundDebug = {
             checkAll: () => {
-                console.log(`=== ANIMAL STATUS ===`);
-                console.log(`Cows: ${this.cows.length}`);
-                console.log(`Birds: ${this.birds.length}`);
-                console.log(`Wolves: ${this.wolves.length}`);
-                console.log(`Stags: ${this.stags.length}`);
-                console.log(`Horses: ${this.horses.length}`);
-                console.log(`Total animals: ${this.cows.length + this.birds.length + this.wolves.length + this.stags.length + this.horses.length}`);
+                console.log('=== ANIMAL STATUS ===')
+                console.log(`Cows: ${this.cows.length}`)
+                console.log(`Birds: ${this.birds.length}`)
+                console.log(`Wolves: ${this.wolves.length}`)
+                console.log(`Stags: ${this.stags.length}`)
+                console.log(`Horses: ${this.horses.length}`)
+                console.log(`Total animals: ${this.cows.length + this.birds.length + this.wolves.length + this.stags.length + this.horses.length}`)
                 
                 // Check detailed status for each animal type
-                console.log('\n=== DETAILED STATUS ===');
+                console.log('\n=== DETAILED STATUS ===')
                 
                 // Check Cows
-                console.log('🐄 COWS:');
+                console.log('🐄 COWS:')
                 this.cows.slice(0, 2).forEach((cow, i) => {
                     console.log(`  Cow ${i}:`, {
                         hasModel: !!cow.model,
@@ -254,11 +252,11 @@ export default class View
                         hasMixer: !!cow.mixer,
                         enableSoundOnLoad: cow.enableSoundOnLoad,
                         soundBuffer: cow.sound?.buffer ? 'loaded' : 'missing'
-                    });
-                });
+                    })
+                })
                 
                 // Check Birds  
-                console.log('🐦 BIRDS:');
+                console.log('🐦 BIRDS:')
                 this.birds.slice(0, 2).forEach((bird, i) => {
                     console.log(`  Bird ${i}:`, {
                         hasModel: !!bird.model,
@@ -266,11 +264,11 @@ export default class View
                         hasMixer: !!bird.mixer,
                         enableSoundOnLoad: bird.enableSoundOnLoad,
                         soundBuffer: bird.sound?.buffer ? 'loaded' : 'missing'
-                    });
-                });
+                    })
+                })
                 
                 // Check Wolves
-                console.log('🐺 WOLVES:');
+                console.log('🐺 WOLVES:')
                 this.wolves.slice(0, 2).forEach((wolf, i) => {
                     console.log(`  Wolf ${i}:`, {
                         hasModel: !!wolf.model,
@@ -279,11 +277,11 @@ export default class View
                         enableSoundOnLoad: wolf.enableSoundOnLoad,
                         soundBuffer: wolf.sound?.buffer ? 'loaded' : 'missing',
                         position: wolf.initialPosition
-                    });
-                });
+                    })
+                })
                 
                 // Check Stags
-                console.log('🦌 STAGS:');
+                console.log('🦌 STAGS:')
                 this.stags.slice(0, 2).forEach((stag, i) => {
                     console.log(`  Stag ${i}:`, {
                         hasModel: !!stag.model,
@@ -292,11 +290,11 @@ export default class View
                         enableSoundOnLoad: stag.enableSoundOnLoad,
                         soundBuffer: stag.sound?.buffer ? 'loaded' : 'missing',
                         position: stag.initialPosition
-                    });
-                });
+                    })
+                })
                 
                 // Check Horses
-                console.log('🐎 HORSES:');
+                console.log('🐎 HORSES:')
                 this.horses.slice(0, 2).forEach((horse, i) => {
                     console.log(`  Horse ${i}:`, {
                         hasModel: !!horse.model,
@@ -305,106 +303,106 @@ export default class View
                         enableSoundOnLoad: horse.enableSoundOnLoad,
                         soundBuffer: horse.sound?.buffer ? 'loaded' : 'missing',
                         position: horse.initialPosition
-                    });
-                });
+                    })
+                })
             },
             testAllNow: () => {
-                console.log('🔊 Testing all sounds immediately...');
+                console.log('🔊 Testing all sounds immediately...')
                 // Reset all delays to 0 and force play
                 this.cows.forEach((cow, i) => {
                     if (cow.sound && cow.sound.buffer) {
-                        cow.lastSoundTime = 0;
-                        cow.soundDelay = i * 1000; // Stagger by 1 second each
-                        console.log(`Cow ${i} delay reset to ${cow.soundDelay}ms`);
+                        cow.lastSoundTime = 0
+                        cow.soundDelay = i * 1000 // Stagger by 1 second each
+                        console.log(`Cow ${i} delay reset to ${cow.soundDelay}ms`)
                     }
-                });
+                })
                 this.wolves.forEach((wolf, i) => {
                     if (wolf.sound && wolf.sound.buffer) {
-                        wolf.lastSoundTime = 0;
-                        wolf.soundDelay = (i + this.cows.length) * 1000;
-                        console.log(`Wolf ${i} delay reset to ${wolf.soundDelay}ms`);
+                        wolf.lastSoundTime = 0
+                        wolf.soundDelay = (i + this.cows.length) * 1000
+                        console.log(`Wolf ${i} delay reset to ${wolf.soundDelay}ms`)
                     }
-                });
+                })
                 this.stags.forEach((stag, i) => {
                     if (stag.sound && stag.sound.buffer) {
-                        stag.lastSoundTime = 0;
-                        stag.soundDelay = (i + this.cows.length + this.wolves.length) * 1000;
-                        console.log(`Stag ${i} delay reset to ${stag.soundDelay}ms`);
+                        stag.lastSoundTime = 0
+                        stag.soundDelay = (i + this.cows.length + this.wolves.length) * 1000
+                        console.log(`Stag ${i} delay reset to ${stag.soundDelay}ms`)
                     }
-                });
+                })
                 this.horses.forEach((horse, i) => {
                     if (horse.sound && horse.sound.buffer) {
-                        horse.lastSoundTime = 0;
-                        horse.soundDelay = (i + this.cows.length + this.wolves.length + this.stags.length) * 1000;
-                        console.log(`Horse ${i} delay reset to ${horse.soundDelay}ms`);
+                        horse.lastSoundTime = 0
+                        horse.soundDelay = (i + this.cows.length + this.wolves.length + this.stags.length) * 1000
+                        console.log(`Horse ${i} delay reset to ${horse.soundDelay}ms`)
                     }
-                });
+                })
                 this.birds.forEach((bird, i) => {
                     if (bird.sound && bird.sound.buffer) {
-                        bird.lastSoundTime = 0;
-                        bird.soundDelay = Math.floor(i / 10) * 1000; // Group birds together
+                        bird.lastSoundTime = 0
+                        bird.soundDelay = Math.floor(i / 10) * 1000 // Group birds together
                     }
-                });
+                })
             },
             testAllImmediately: () => {
-                console.log('Testing all sounds immediately...');
+                console.log('Testing all sounds immediately...')
                 this.wolves.forEach((wolf, i) => {
-                    console.log(`Testing wolf ${i} sound...`);
-                    if (wolf.playSound) wolf.playSound();
-                });
+                    console.log(`Testing wolf ${i} sound...`)
+                    if (wolf.playSound) wolf.playSound()
+                })
                 this.stags.forEach((stag, i) => {
-                    console.log(`Testing stag ${i} sound...`);
-                    if (stag.playSound) stag.playSound();
-                });
+                    console.log(`Testing stag ${i} sound...`)
+                    if (stag.playSound) stag.playSound()
+                })
                 this.horses.forEach((horse, i) => {
-                    console.log(`Testing horse ${i} sound...`);
-                    if (horse.playSound) horse.playSound();
-                });
+                    console.log(`Testing horse ${i} sound...`)
+                    if (horse.playSound) horse.playSound()
+                })
             },
             forceEnableAllSounds: () => {
-                console.log('Force enabling all sounds...');
+                console.log('Force enabling all sounds...')
                 this.wolves.forEach(wolf => {
-                    if (wolf.enableSound) wolf.enableSound();
-                });
+                    if (wolf.enableSound) wolf.enableSound()
+                })
                 this.stags.forEach(stag => {
-                    if (stag.enableSound) stag.enableSound();
-                });
+                    if (stag.enableSound) stag.enableSound()
+                })
                 this.horses.forEach(horse => {
-                    if (horse.enableSound) horse.enableSound();
-                });
+                    if (horse.enableSound) horse.enableSound()
+                })
             },
             resetDelays: () => {
-                console.log('Resetting all sound delays...');
+                console.log('Resetting all sound delays...')
                 this.wolves.forEach(wolf => {
-                    if (wolf.lastSoundTime !== undefined) wolf.lastSoundTime = 0;
-                });
+                    if (wolf.lastSoundTime !== undefined) wolf.lastSoundTime = 0
+                })
                 this.stags.forEach(stag => {
-                    if (stag.lastSoundTime !== undefined) stag.lastSoundTime = 0;
-                });
+                    if (stag.lastSoundTime !== undefined) stag.lastSoundTime = 0
+                })
                 this.horses.forEach(horse => {
-                    if (horse.lastSoundTime !== undefined) horse.lastSoundTime = 0;
-                });
+                    if (horse.lastSoundTime !== undefined) horse.lastSoundTime = 0
+                })
             },
             spawnOneWolf: () => {
-                console.log('Spawning one wolf for testing...');
-                const playerPos = Game.getInstance().state.player.position.current;
-                const time = Date.now() / 1000;
-                const x = playerPos[0] + 20; // 20 units away
-                const z = playerPos[2] + 20;
-                const y = this.terrainHelper.getElevation(x, z, Game.getInstance().state.terrains.maxIterations) + 0.5;
+                console.log('Spawning one wolf for testing...')
+                const playerPos = Game.getInstance().state.player.position.current
+                const time = Date.now() / 1000
+                const x = playerPos[0] + 20 // 20 units away
+                const z = playerPos[2] + 20
+                const y = this.terrainHelper.getElevation(x, z, Game.getInstance().state.terrains.maxIterations) + 0.5
                 
                 try {
-                    const wolf = new Wolf(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.wolf, this.soundConfig);
-                    if (wolf.model) wolf.model.scale.setScalar(this.animalConfig.scale.wolf);
-                    this.wolves.push(wolf);
-                    console.log('Test wolf created successfully at:', x, y, z);
-                    return wolf;
+                    const wolf = new Wolf(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.wolf, this.soundConfig)
+                    if (wolf.model) wolf.model.scale.setScalar(this.animalConfig.scale.wolf)
+                    this.wolves.push(wolf)
+                    console.log('Test wolf created successfully at:', x, y, z)
+                    return wolf
                 } catch (error) {
-                    console.error('Error creating test wolf:', error);
-                    return null;
+                    console.error('Error creating test wolf:', error)
+                    return null
                 }
             }
-        };
+        }
         
         // Add console debugging commands
         window.cowDebug = {
@@ -414,102 +412,102 @@ export default class View
             testClose: () => specialCow.testSoundWithSettings(1.0, 50, 1000, 0.5),
             // TEST METHODS TO COMPARE COW WITH OTHER ANIMALS
             testCowVsBird: () => {
-                console.log('=== Testing Cow vs Bird Sound Quality ===');
-                console.log('Playing cow sound...');
-                specialCow.testSound();
+                console.log('=== Testing Cow vs Bird Sound Quality ===')
+                console.log('Playing cow sound...')
+                specialCow.testSound()
                 setTimeout(() => {
-                    console.log('Playing bird sound...');
-                    specialBird.testSound();
-                }, 3000);
+                    console.log('Playing bird sound...')
+                    specialBird.testSound()
+                }, 3000)
             },
             testWithMinimalSettings: () => {
-                console.log('=== Testing cow with minimal settings ===');
-                specialCow.testSoundWithSettings(0.1, 1, 1000, 0.5);
+                console.log('=== Testing cow with minimal settings ===')
+                specialCow.testSoundWithSettings(0.1, 1, 1000, 0.5)
             },
             testStandardAudio: () => {
-                console.log('=== Testing cow with standard Audio (non-positional) ===');
-                specialCow.testWithStandardAudio();
+                console.log('=== Testing cow with standard Audio (non-positional) ===')
+                specialCow.testWithStandardAudio()
             },
             testNoDistanceAttenuation: () => {
-                console.log('=== Testing cow with NO distance attenuation ===');
+                console.log('=== Testing cow with NO distance attenuation ===')
                 // Test với rolloffFactor = 0 (không có suy giảm khoảng cách)
-                specialCow.testSoundWithSettings(0.5, 1000, 10000, 0);
+                specialCow.testSoundWithSettings(0.5, 1000, 10000, 0)
             },
             testLinearVsExponential: () => {
-                console.log('=== Testing different distance models ===');
-                console.log('Current model: linear - Testing for 3 seconds...');
-                specialCow.testSound();
+                console.log('=== Testing different distance models ===')
+                console.log('Current model: linear - Testing for 3 seconds...')
+                specialCow.testSound()
                 
                 setTimeout(() => {
-                    console.log('Switching to exponential model...');
+                    console.log('Switching to exponential model...')
                     if (specialCow.sound) {
-                        specialCow.sound.panner.distanceModel = 'exponential';
-                        specialCow.testSound();
+                        specialCow.sound.panner.distanceModel = 'exponential'
+                        specialCow.testSound()
                     }
-                }, 4000);
+                }, 4000)
                 
                 setTimeout(() => {
-                    console.log('Switching to inverse model...');
+                    console.log('Switching to inverse model...')
                     if (specialCow.sound) {
-                        specialCow.sound.panner.distanceModel = 'inverse';
-                        specialCow.testSound();
+                        specialCow.sound.panner.distanceModel = 'inverse'
+                        specialCow.testSound()
                     }
-                }, 8000);
+                }, 8000)
             },
             liveDistanceTest: () => {
-                console.log('=== Live Distance Testing - Move away from cow and run these ===');
-                console.log('cowDebug.setNoAttenuation() - Remove distance effects');
-                console.log('cowDebug.setLinearAttenuation() - Linear distance model');
-                console.log('cowDebug.setInverseAttenuation() - Inverse distance model');
+                console.log('=== Live Distance Testing - Move away from cow and run these ===')
+                console.log('cowDebug.setNoAttenuation() - Remove distance effects')
+                console.log('cowDebug.setLinearAttenuation() - Linear distance model')
+                console.log('cowDebug.setInverseAttenuation() - Inverse distance model')
             },
             setNoAttenuation: () => {
-                console.log('Setting NO distance attenuation...');
-                specialCow.updateDistanceSettings(1000, 10000, 0, 'linear');
+                console.log('Setting NO distance attenuation...')
+                specialCow.updateDistanceSettings(1000, 10000, 0, 'linear')
             },
             setLinearAttenuation: () => {
-                console.log('Setting LINEAR attenuation...');
-                specialCow.updateDistanceSettings(10, 100, 1, 'linear');
+                console.log('Setting LINEAR attenuation...')
+                specialCow.updateDistanceSettings(10, 100, 1, 'linear')
             },
             setInverseAttenuation: () => {
-                console.log('Setting INVERSE attenuation...');
-                specialCow.updateDistanceSettings(10, 100, 1, 'inverse');
+                console.log('Setting INVERSE attenuation...')
+                specialCow.updateDistanceSettings(10, 100, 1, 'inverse')
             },
             // CUSTOM DISTANCE ATTENUATION CONTROLS
             enableDistanceLogging: () => {
-                console.log('Enabling distance logging for cow...');
-                specialCow.setDistanceLogging(true);
+                console.log('Enabling distance logging for cow...')
+                specialCow.setDistanceLogging(true)
             },
             disableDistanceLogging: () => {
-                console.log('Disabling distance logging for cow...');
-                specialCow.setDistanceLogging(false);
+                console.log('Disabling distance logging for cow...')
+                specialCow.setDistanceLogging(false)
             },
             testCustomDistance: () => {
-                console.log('Testing custom distance attenuation...');
-                console.log('Move near/far from cow to see volume changes');
-                console.log('Use cowDebug.enableDistanceLogging() to see real-time distance/volume');
-                specialCow.setDistanceLogging(true);
+                console.log('Testing custom distance attenuation...')
+                console.log('Move near/far from cow to see volume changes')
+                console.log('Use cowDebug.enableDistanceLogging() to see real-time distance/volume')
+                specialCow.setDistanceLogging(true)
             },
             checkDistanceSystem: () => {
-                console.log('=== Checking Distance System Status ===');
-                specialCow.checkDistanceSystem();
+                console.log('=== Checking Distance System Status ===')
+                specialCow.checkDistanceSystem()
             },
             testWithoutBG: () => {
                 // Stop background music and test cow
-                const wasPlaying = this.backgroundMusic?.isPlaying;
+                const wasPlaying = this.backgroundMusic?.isPlaying
                 if (wasPlaying) {
-                    console.log('[Debug] Stopping BG music for cow test...');
-                    this.backgroundMusic.stop();
+                    console.log('[Debug] Stopping BG music for cow test...')
+                    this.backgroundMusic.stop()
                 }
                 setTimeout(() => {
-                    specialCow.testSound();
+                    specialCow.testSound()
                     // Restore BG music after test
                     if (wasPlaying) {
                         setTimeout(() => {
-                            console.log('[Debug] Restarting BG music...');
-                            this.playBackgroundMusic();
-                        }, 3000);
+                            console.log('[Debug] Restarting BG music...')
+                            this.playBackgroundMusic()
+                        }, 3000)
                     }
-                }, 100);
+                }, 100)
             },
             //     // Stop background music and test cow
             //     const wasPlaying = this.backgroundMusic?.isPlaying;
@@ -529,18 +527,18 @@ export default class View
             //     }, 100);
             // },
             checkAudioContext: () => {
-                const ctx = this.audioListener.context;
+                const ctx = this.audioListener.context
                 console.log('Audio Context Info:', {
                     state: ctx.state,
                     sampleRate: ctx.sampleRate,
                     currentTime: ctx.currentTime,
                     destination: ctx.destination,
                     activeSourceCount: ctx.audioWorklet ? 'Available' : 'Not available'
-                });
+                })
                 
                 // Check if background music and cow sound use same context - COMMENTED OUT
                 // console.log('Background Music Context:', this.backgroundMusic?.context === ctx);
-                console.log('Cow Sound Context:', specialCow.sound?.context === ctx);
+                console.log('Cow Sound Context:', specialCow.sound?.context === ctx)
                 
                 // Check for audio mixing issues - COMMENTED OUT
                 // if (this.backgroundMusic?.isPlaying && specialCow.sound?.isPlaying) {
@@ -551,8 +549,8 @@ export default class View
             },
             info: () => {
                 if (specialCow.sound) {
-                    const soundBuffer = specialCow.sound.buffer;
-                    const bgBuffer = this.backgroundMusic?.buffer;
+                    const soundBuffer = specialCow.sound.buffer
+                    // const bgBuffer = this.backgroundMusic?.buffer; // Unused variable removed
                     
                     console.log('Cow Sound Info:', {
                         hasBuffer: !!soundBuffer,
@@ -565,7 +563,7 @@ export default class View
                         sampleRate: soundBuffer?.sampleRate,
                         duration: soundBuffer?.duration,
                         channels: soundBuffer?.numberOfChannels
-                    });
+                    })
                     
                     // BACKGROUND MUSIC INFO COMMENTED OUT FOR TESTING
                     // if (this.backgroundMusic && bgBuffer) {
@@ -585,7 +583,7 @@ export default class View
                     //     }
                     // }
                 } else {
-                    console.log('No cow sound object');
+                    console.log('No cow sound object')
                 }
             }
             // ALL BACKGROUND MUSIC RELATED COMMANDS COMMENTED OUT FOR TESTING
@@ -642,71 +640,71 @@ export default class View
             //         specialCow.testSound();
             //     }, 8000);
             // }
-        };
+        }
 
-        const birdHeightOffset = 20;
-        let yBirdFront = this.terrainHelper.getElevation(frontSpawnX, frontSpawnZ, elevationIterations) + birdHeightOffset;
-        const birdFrontPosition = new THREE.Vector3(frontSpawnX, yBirdFront, frontSpawnZ);
-        console.log(`[View.js] About to create special Bird at`, birdFrontPosition);
-        const specialBird = new Bird(this.scene, game.state.time, birdFrontPosition, this.audioListener, true, this.soundConfig);
-        this.birds.push(specialBird);
-        console.log(`[View.js] Special Bird created successfully`);
+        const birdHeightOffset = 20
+        let yBirdFront = this.terrainHelper.getElevation(frontSpawnX, frontSpawnZ, elevationIterations) + birdHeightOffset
+        const birdFrontPosition = new THREE.Vector3(frontSpawnX, yBirdFront, frontSpawnZ)
+        console.log('[View.js] About to create special Bird at', birdFrontPosition)
+        const specialBird = new Bird(this.scene, game.state.time, birdFrontPosition, this.audioListener, true, this.soundConfig)
+        this.birds.push(specialBird)
+        console.log('[View.js] Special Bird created successfully')
         
         // Expose bird for debugging
-        window.debugBird = specialBird;
+        window.debugBird = specialBird
 
         // Debug commands for sound-enabled animals  
-        const view = this; // Capture view instance for debug commands
+        const view = this // Capture view instance for debug commands
         
         // Add debug commands cho wolf (sẽ tạo wolf đầu tiên sau khi spawn)
         window.wolfDebug = {
             test: () => {
-                const firstWolf = view.wolves[0];
+                const firstWolf = view.wolves[0]
                 if (firstWolf && firstWolf.testSound) {
-                    firstWolf.testSound();
+                    firstWolf.testSound()
                 } else {
-                    console.log('No wolf available or testSound method not found');
+                    console.log('No wolf available or testSound method not found')
                 }
             },
             testWithSettings: (vol, ref, max, rolloff) => {
-                const firstWolf = view.wolves[0];
+                const firstWolf = view.wolves[0]
                 if (firstWolf && firstWolf.testSoundWithSettings) {
-                    firstWolf.testSoundWithSettings(vol, ref, max, rolloff);
+                    firstWolf.testSoundWithSettings(vol, ref, max, rolloff)
                 } else {
-                    console.log('No wolf available or testSoundWithSettings method not found');
+                    console.log('No wolf available or testSoundWithSettings method not found')
                 }
             },
             enableDistanceLogging: () => {
-                const firstWolf = view.wolves[0];
+                const firstWolf = view.wolves[0]
                 if (firstWolf && firstWolf.setDistanceLogging) {
-                    console.log('Enabling distance logging for wolf...');
-                    firstWolf.setDistanceLogging(true);
+                    console.log('Enabling distance logging for wolf...')
+                    firstWolf.setDistanceLogging(true)
                 } else {
-                    console.log('No wolf available or setDistanceLogging method not found');
+                    console.log('No wolf available or setDistanceLogging method not found')
                 }
             },
             disableDistanceLogging: () => {
-                const firstWolf = view.wolves[0];
+                const firstWolf = view.wolves[0]
                 if (firstWolf && firstWolf.setDistanceLogging) {
-                    console.log('Disabling distance logging for wolf...');
-                    firstWolf.setDistanceLogging(false);
+                    console.log('Disabling distance logging for wolf...')
+                    firstWolf.setDistanceLogging(false)
                 } else {
-                    console.log('No wolf available or setDistanceLogging method not found');
+                    console.log('No wolf available or setDistanceLogging method not found')
                 }
             },
             checkDistanceSystem: () => {
-                const firstWolf = view.wolves[0];
+                const firstWolf = view.wolves[0]
                 if (firstWolf && firstWolf.checkDistanceSystem) {
-                    console.log('=== Checking Wolf Distance System Status ===');
-                    firstWolf.checkDistanceSystem();
+                    console.log('=== Checking Wolf Distance System Status ===')
+                    firstWolf.checkDistanceSystem()
                 } else {
-                    console.log('No wolf available or checkDistanceSystem method not found');
+                    console.log('No wolf available or checkDistanceSystem method not found')
                 }
             },
             info: () => {
-                const firstWolf = view.wolves[0];
+                const firstWolf = view.wolves[0]
                 if (firstWolf && firstWolf.sound) {
-                    const soundBuffer = firstWolf.sound.buffer;
+                    const soundBuffer = firstWolf.sound.buffer
                     
                     console.log('Wolf Sound Info:', {
                         hasBuffer: !!soundBuffer,
@@ -719,71 +717,71 @@ export default class View
                         sampleRate: soundBuffer?.sampleRate,
                         duration: soundBuffer?.duration,
                         channels: soundBuffer?.numberOfChannels
-                    });
+                    })
                 } else {
-                    console.log('No wolf sound object available');
+                    console.log('No wolf sound object available')
                 }
             },
             testAllWolves: () => {
-                console.log(`Testing all ${view.wolves.length} wolves...`);
+                console.log(`Testing all ${view.wolves.length} wolves...`)
                 view.wolves.forEach((wolf, i) => {
                     if (wolf && wolf.testSound) {
-                        console.log(`Testing wolf ${i}...`);
-                        setTimeout(() => wolf.testSound(), i * 1500); // Stagger tests
+                        console.log(`Testing wolf ${i}...`)
+                        setTimeout(() => wolf.testSound(), i * 1500) // Stagger tests
                     }
-                });
+                })
             }
-        };
+        }
 
         // Add debug commands cho horse
         window.horseDebug = {
             test: () => {
-                const firstHorse = view.horses[0];
+                const firstHorse = view.horses[0]
                 if (firstHorse && firstHorse.testSound) {
-                    firstHorse.testSound();
+                    firstHorse.testSound()
                 } else {
-                    console.log('No horse available or testSound method not found');
+                    console.log('No horse available or testSound method not found')
                 }
             },
             testWithSettings: (vol, ref, max, rolloff) => {
-                const firstHorse = view.horses[0];
+                const firstHorse = view.horses[0]
                 if (firstHorse && firstHorse.testSoundWithSettings) {
-                    firstHorse.testSoundWithSettings(vol, ref, max, rolloff);
+                    firstHorse.testSoundWithSettings(vol, ref, max, rolloff)
                 } else {
-                    console.log('No horse available or testSoundWithSettings method not found');
+                    console.log('No horse available or testSoundWithSettings method not found')
                 }
             },
             enableDistanceLogging: () => {
-                const firstHorse = view.horses[0];
+                const firstHorse = view.horses[0]
                 if (firstHorse && firstHorse.setDistanceLogging) {
-                    console.log('Enabling distance logging for horse...');
-                    firstHorse.setDistanceLogging(true);
+                    console.log('Enabling distance logging for horse...')
+                    firstHorse.setDistanceLogging(true)
                 } else {
-                    console.log('No horse available or setDistanceLogging method not found');
+                    console.log('No horse available or setDistanceLogging method not found')
                 }
             },
             disableDistanceLogging: () => {
-                const firstHorse = view.horses[0];
+                const firstHorse = view.horses[0]
                 if (firstHorse && firstHorse.setDistanceLogging) {
-                    console.log('Disabling distance logging for horse...');
-                    firstHorse.setDistanceLogging(false);
+                    console.log('Disabling distance logging for horse...')
+                    firstHorse.setDistanceLogging(false)
                 } else {
-                    console.log('No horse available or setDistanceLogging method not found');
+                    console.log('No horse available or setDistanceLogging method not found')
                 }
             },
             checkDistanceSystem: () => {
-                const firstHorse = view.horses[0];
+                const firstHorse = view.horses[0]
                 if (firstHorse && firstHorse.checkDistanceSystem) {
-                    console.log('=== Checking Horse Distance System Status ===');
-                    firstHorse.checkDistanceSystem();
+                    console.log('=== Checking Horse Distance System Status ===')
+                    firstHorse.checkDistanceSystem()
                 } else {
-                    console.log('No horse available or checkDistanceSystem method not found');
+                    console.log('No horse available or checkDistanceSystem method not found')
                 }
             },
             info: () => {
-                const firstHorse = view.horses[0];
+                const firstHorse = view.horses[0]
                 if (firstHorse && firstHorse.sound) {
-                    const soundBuffer = firstHorse.sound.buffer;
+                    const soundBuffer = firstHorse.sound.buffer
                     
                     console.log('Horse Sound Info:', {
                         hasBuffer: !!soundBuffer,
@@ -796,71 +794,71 @@ export default class View
                         sampleRate: soundBuffer?.sampleRate,
                         duration: soundBuffer?.duration,
                         channels: soundBuffer?.numberOfChannels
-                    });
+                    })
                 } else {
-                    console.log('No horse sound object available');
+                    console.log('No horse sound object available')
                 }
             },
             testAllHorses: () => {
-                console.log(`Testing all ${view.horses.length} horses...`);
+                console.log(`Testing all ${view.horses.length} horses...`)
                 view.horses.forEach((horse, i) => {
                     if (horse && horse.testSound) {
-                        console.log(`Testing horse ${i}...`);
-                        setTimeout(() => horse.testSound(), i * 1500); // Stagger tests
+                        console.log(`Testing horse ${i}...`)
+                        setTimeout(() => horse.testSound(), i * 1500) // Stagger tests
                     }
-                });
+                })
             }
-        };
+        }
 
         // Add debug commands cho stag
         window.stagDebug = {
             test: () => {
-                const firstStag = view.stags[0];
+                const firstStag = view.stags[0]
                 if (firstStag && firstStag.testSound) {
-                    firstStag.testSound();
+                    firstStag.testSound()
                 } else {
-                    console.log('No stag available or testSound method not found');
+                    console.log('No stag available or testSound method not found')
                 }
             },
             testWithSettings: (vol, ref, max, rolloff) => {
-                const firstStag = view.stags[0];
+                const firstStag = view.stags[0]
                 if (firstStag && firstStag.testSoundWithSettings) {
-                    firstStag.testSoundWithSettings(vol, ref, max, rolloff);
+                    firstStag.testSoundWithSettings(vol, ref, max, rolloff)
                 } else {
-                    console.log('No stag available or testSoundWithSettings method not found');
+                    console.log('No stag available or testSoundWithSettings method not found')
                 }
             },
             enableDistanceLogging: () => {
-                const firstStag = view.stags[0];
+                const firstStag = view.stags[0]
                 if (firstStag && firstStag.setDistanceLogging) {
-                    console.log('Enabling distance logging for stag...');
-                    firstStag.setDistanceLogging(true);
+                    console.log('Enabling distance logging for stag...')
+                    firstStag.setDistanceLogging(true)
                 } else {
-                    console.log('No stag available or setDistanceLogging method not found');
+                    console.log('No stag available or setDistanceLogging method not found')
                 }
             },
             disableDistanceLogging: () => {
-                const firstStag = view.stags[0];
+                const firstStag = view.stags[0]
                 if (firstStag && firstStag.setDistanceLogging) {
-                    console.log('Disabling distance logging for stag...');
-                    firstStag.setDistanceLogging(false);
+                    console.log('Disabling distance logging for stag...')
+                    firstStag.setDistanceLogging(false)
                 } else {
-                    console.log('No stag available or setDistanceLogging method not found');
+                    console.log('No stag available or setDistanceLogging method not found')
                 }
             },
             checkDistanceSystem: () => {
-                const firstStag = view.stags[0];
+                const firstStag = view.stags[0]
                 if (firstStag && firstStag.checkDistanceSystem) {
-                    console.log('=== Checking Stag Distance System Status ===');
-                    firstStag.checkDistanceSystem();
+                    console.log('=== Checking Stag Distance System Status ===')
+                    firstStag.checkDistanceSystem()
                 } else {
-                    console.log('No stag available or checkDistanceSystem method not found');
+                    console.log('No stag available or checkDistanceSystem method not found')
                 }
             },
             info: () => {
-                const firstStag = view.stags[0];
+                const firstStag = view.stags[0]
                 if (firstStag && firstStag.sound) {
-                    const soundBuffer = firstStag.sound.buffer;
+                    const soundBuffer = firstStag.sound.buffer
                     
                     console.log('Stag Sound Info:', {
                         hasBuffer: !!soundBuffer,
@@ -873,279 +871,279 @@ export default class View
                         sampleRate: soundBuffer?.sampleRate,
                         duration: soundBuffer?.duration,
                         channels: soundBuffer?.numberOfChannels
-                    });
+                    })
                 } else {
-                    console.log('No stag sound object available');
+                    console.log('No stag sound object available')
                 }
             },
             testAllStags: () => {
-                console.log(`Testing all ${view.stags.length} stags...`);
+                console.log(`Testing all ${view.stags.length} stags...`)
                 view.stags.forEach((stag, i) => {
                     if (stag && stag.testSound) {
-                        console.log(`Testing stag ${i}...`);
-                        setTimeout(() => stag.testSound(), i * 1500); // Stagger tests
+                        console.log(`Testing stag ${i}...`)
+                        setTimeout(() => stag.testSound(), i * 1500) // Stagger tests
                     }
-                });
+                })
             }
-        };
+        }
 
         window.animalSoundDebug = {
             testAllSounds: () => {
-                console.log('=== Testing All Animal Sounds ===');
-                if (window.debugCow) window.debugCow.testSound();
+                console.log('=== Testing All Animal Sounds ===')
+                if (window.debugCow) window.debugCow.testSound()
                 setTimeout(() => {
-                    if (window.debugBird) window.debugBird.testSound();
-                }, 2000);
+                    if (window.debugBird) window.debugBird.testSound()
+                }, 2000)
                 setTimeout(() => {
-                    const firstWolf = view.wolves[0];
+                    const firstWolf = view.wolves[0]
                     if (firstWolf && firstWolf.sound) {
-                        console.log('Testing wolf sound...');
-                        firstWolf.sound.play();
+                        console.log('Testing wolf sound...')
+                        firstWolf.sound.play()
                     } else {
-                        console.log('No wolf or wolf sound available');
+                        console.log('No wolf or wolf sound available')
                     }
-                }, 4000);
+                }, 4000)
                 setTimeout(() => {
-                    const firstHorse = view.horses[0];
+                    const firstHorse = view.horses[0]
                     if (firstHorse && firstHorse.sound) {
-                        console.log('Testing horse sound...');
-                        firstHorse.sound.play();
+                        console.log('Testing horse sound...')
+                        firstHorse.sound.play()
                     } else {
-                        console.log('No horse or horse sound available');
+                        console.log('No horse or horse sound available')
                     }
-                }, 6000);
+                }, 6000)
                 setTimeout(() => {
-                    const firstStag = view.stags[0];
+                    const firstStag = view.stags[0]
                     if (firstStag && firstStag.sound) {
-                        console.log('Testing stag sound...');
-                        firstStag.sound.play();
+                        console.log('Testing stag sound...')
+                        firstStag.sound.play()
                     } else {
-                        console.log('No stag or stag sound available');
+                        console.log('No stag or stag sound available')
                     }
-                }, 8000);
+                }, 8000)
             },
             testWolf: () => {
-                const wolf = view.wolves[0];
+                const wolf = view.wolves[0]
                 if (wolf && wolf.sound) {
-                    console.log('Testing wolf sound directly...');
-                    wolf.sound.play();
+                    console.log('Testing wolf sound directly...')
+                    wolf.sound.play()
                 } else {
-                    console.log('Wolf not found or no sound. Wolves array:', view.wolves.length);
+                    console.log('Wolf not found or no sound. Wolves array:', view.wolves.length)
                 }
             },
             testHorse: () => {
-                const horse = view.horses[0];
+                const horse = view.horses[0]
                 if (horse && horse.sound) {
-                    console.log('Testing horse sound directly...');
-                    horse.sound.play();
+                    console.log('Testing horse sound directly...')
+                    horse.sound.play()
                 } else {
-                    console.log('Horse not found or no sound. Horses array:', view.horses.length);
+                    console.log('Horse not found or no sound. Horses array:', view.horses.length)
                 }
             },
             testStag: () => {
-                const stag = view.stags[0];
+                const stag = view.stags[0]
                 if (stag && stag.sound) {
-                    console.log('Testing stag sound directly...');
-                    stag.sound.play();
+                    console.log('Testing stag sound directly...')
+                    stag.sound.play()
                 } else {
-                    console.log('Stag not found or no sound. Stags array:', view.stags.length);
+                    console.log('Stag not found or no sound. Stags array:', view.stags.length)
                 }
             },
             checkSoundEnabledAnimals: () => {
-                console.log('=== Sound-Enabled Animals Status ===');
-                console.log('Wolves:', view.wolves.length, 'animals');
+                console.log('=== Sound-Enabled Animals Status ===')
+                console.log('Wolves:', view.wolves.length, 'animals')
                 view.wolves.forEach((wolf, i) => {
                     console.log(`Wolf ${i}:`, {
                         hasSound: !!wolf.sound,
                         hasModel: !!wolf.model,
                         isPlaying: wolf.isPlaying,
                         position: wolf.initialPosition
-                    });
-                });
-                console.log('Horses:', view.horses.length, 'animals');
+                    })
+                })
+                console.log('Horses:', view.horses.length, 'animals')
                 view.horses.forEach((horse, i) => {
                     console.log(`Horse ${i}:`, {
                         hasSound: !!horse.sound,
                         hasModel: !!horse.model,
                         isPlaying: horse.isPlaying,
                         position: horse.initialPosition
-                    });
-                });
-                console.log('Stags:', view.stags.length, 'animals');
+                    })
+                })
+                console.log('Stags:', view.stags.length, 'animals')
                 view.stags.forEach((stag, i) => {
                     console.log(`Stag ${i}:`, {
                         hasSound: !!stag.sound,
                         hasModel: !!stag.model,
                         isPlaying: stag.isPlaying,
                         position: stag.initialPosition
-                    });
-                });
+                    })
+                })
             },
             forcePlayAll: () => {
-                console.log('=== Force Playing All Sound-Enabled Animals ===');
+                console.log('=== Force Playing All Sound-Enabled Animals ===')
                 view.wolves.forEach((wolf, i) => {
                     if (wolf.sound) {
-                        console.log(`Force playing wolf ${i}`);
-                        wolf.isPlaying = false; // Reset playing state
-                        wolf.lastSoundTime = 0; // Reset delay
+                        console.log(`Force playing wolf ${i}`)
+                        wolf.isPlaying = false // Reset playing state
+                        wolf.lastSoundTime = 0 // Reset delay
                     }
-                });
+                })
                 view.horses.forEach((horse, i) => {
                     if (horse.sound) {
-                        console.log(`Force playing horse ${i}`);
-                        horse.isPlaying = false;
-                        horse.lastSoundTime = 0;
+                        console.log(`Force playing horse ${i}`)
+                        horse.isPlaying = false
+                        horse.lastSoundTime = 0
                     }
-                });
+                })
                 view.stags.forEach((stag, i) => {
                     if (stag.sound) {
-                        console.log(`Force playing stag ${i}`);
-                        stag.isPlaying = false;
-                        stag.lastSoundTime = 0;
+                        console.log(`Force playing stag ${i}`)
+                        stag.isPlaying = false
+                        stag.lastSoundTime = 0
                     }
-                });
+                })
             }
-        };
+        }
 
         // Using legacy hardcoded spawning (will be replaced by config system)
-        const numberOfCows = 2;
-        const numberOfBirds = 10;
-        const numberOfPanthers = this.animalConfig.number.blackPanther;
-        const numberOfDeers = this.animalConfig.number.deer;
-        const numberOfSheeps = this.animalConfig.number.sheep;
-        const pantherModelVerticalOffset = 0.5;
-        const deerModelVerticalOffset = 0.5;
+        const numberOfCows = 2
+        const numberOfBirds = 10
+        const numberOfPanthers = this.animalConfig.number.blackPanther
+        const numberOfDeers = this.animalConfig.number.deer
+        const numberOfSheeps = this.animalConfig.number.sheep
+        const pantherModelVerticalOffset = 0.5
+        const deerModelVerticalOffset = 0.5
 
         for (let i = 0; i < numberOfCows - 1; i++) {
-            let position;
-            let attempts = 0;
-            let x, z, y;
-            let foundSuitableSpot = false;
-            const cowSpawnRange = this.animalConfig.spawnRange.cow;
+            let position
+            let attempts = 0
+            let x, z, y
+            let foundSuitableSpot = false
+            const cowSpawnRange = this.animalConfig.spawnRange.cow
 
             while(attempts < MAX_SPAWN_ATTEMPTS_PER_ANIMAL && !foundSuitableSpot) {
-                x = (Math.random() - 0.5) * cowSpawnRange * 2;
-                z = (Math.random() - 0.5) * cowSpawnRange * 2;
+                x = (Math.random() - 0.5) * cowSpawnRange * 2
+                z = (Math.random() - 0.5) * cowSpawnRange * 2
                 if(this.isPositionSuitable(x, z, elevationIterations, COW_FLATNESS_CHECK_DISTANCE, COW_MAX_ELEVATION_DIFFERENCE)) {
-                    foundSuitableSpot = true;
+                    foundSuitableSpot = true
                 }
-                attempts++;
+                attempts++
             }
             
-            y = this.terrainHelper.getElevation(x, z, elevationIterations) + cowModelVerticalOffset;
-            position = new THREE.Vector3(x, y, z);
+            y = this.terrainHelper.getElevation(x, z, elevationIterations) + cowModelVerticalOffset
+            position = new THREE.Vector3(x, y, z)
 
             if (!foundSuitableSpot) {
-                console.warn(`[View.js] Could not find a perfectly flat spot for Cow ${i + 1} after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`);
+                console.warn(`[View.js] Could not find a perfectly flat spot for Cow ${i + 1} after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
-            console.log(`[View.js] About to create Cow ${i + 1} at`, position);
-            const cow = new Cow(this.scene, game.state.time, position, this.audioListener, true, this.soundConfig);
-            this.cows.push(cow);
-            console.log(`[View.js] Cow ${i + 1} created successfully`);
+            console.log(`[View.js] About to create Cow ${i + 1} at`, position)
+            const cow = new Cow(this.scene, game.state.time, position, this.audioListener, true, this.soundConfig)
+            this.cows.push(cow)
+            console.log(`[View.js] Cow ${i + 1} created successfully`)
         }
 
         for (let i = 0; i < numberOfBirds -1; i++) {
-            const birdSpawnRange = this.animalConfig.spawnRange.bird;
-            const x = (Math.random() - 0.5) * birdSpawnRange * 2;
-            const z = (Math.random() - 0.5) * birdSpawnRange * 2;
-            const y = this.terrainHelper.getElevation(x, z, elevationIterations) + birdHeightOffset;
-            const position = new THREE.Vector3(x, y, z);
-            console.log(`[View.js] About to create Bird ${i + 1} at`, position);
-            const bird = new Bird(this.scene, game.state.time, position, this.audioListener, true, this.soundConfig);
-            this.birds.push(bird);
-            console.log(`[View.js] Bird ${i + 1} created successfully`);
+            const birdSpawnRange = this.animalConfig.spawnRange.bird
+            const x = (Math.random() - 0.5) * birdSpawnRange * 2
+            const z = (Math.random() - 0.5) * birdSpawnRange * 2
+            const y = this.terrainHelper.getElevation(x, z, elevationIterations) + birdHeightOffset
+            const position = new THREE.Vector3(x, y, z)
+            console.log(`[View.js] About to create Bird ${i + 1} at`, position)
+            const bird = new Bird(this.scene, game.state.time, position, this.audioListener, true, this.soundConfig)
+            this.birds.push(bird)
+            console.log(`[View.js] Bird ${i + 1} created successfully`)
         }
 
         for (let i = 0; i < numberOfPanthers; i++) {
-            let position;
-            let attempts = 0;
-            let x, z, y;
-            let foundSuitableSpot = false;
-            const pantherSpawnRange = this.animalConfig.spawnRange.blackPanther;
+            let position
+            let attempts = 0
+            let x, z, y
+            let foundSuitableSpot = false
+            const pantherSpawnRange = this.animalConfig.spawnRange.blackPanther
 
             while(attempts < MAX_SPAWN_ATTEMPTS_PER_ANIMAL && !foundSuitableSpot) {
-                x = (Math.random() - 0.5) * pantherSpawnRange * 2;
-                z = (Math.random() - 0.5) * pantherSpawnRange * 2;
+                x = (Math.random() - 0.5) * pantherSpawnRange * 2
+                z = (Math.random() - 0.5) * pantherSpawnRange * 2
                 if(this.isPositionSuitable(x, z, elevationIterations, PANTHER_FLATNESS_CHECK_DISTANCE, PANTHER_MAX_ELEVATION_DIFFERENCE)) {
-                    foundSuitableSpot = true;
+                    foundSuitableSpot = true
                 }
-                attempts++;
+                attempts++
             }
             
-            y = this.terrainHelper.getElevation(x, z, elevationIterations) + pantherModelVerticalOffset;
-            position = new THREE.Vector3(x, y, z);
+            y = this.terrainHelper.getElevation(x, z, elevationIterations) + pantherModelVerticalOffset
+            position = new THREE.Vector3(x, y, z)
 
             if (!foundSuitableSpot) {
-                console.warn(`[View.js] Could not find a suitable spot for Panther ${i + 1} after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`);
+                console.warn(`[View.js] Could not find a suitable spot for Panther ${i + 1} after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
-            const panther = new BlackPanther(this.scene, game.state.time, position);
+            const panther = new BlackPanther(this.scene, game.state.time, position)
             // Apply scale from config after model loads
-            if (panther.model) panther.model.scale.setScalar(this.animalConfig.scale.blackPanther);
-            this.blackPanthers.push(panther);
+            if (panther.model) panther.model.scale.setScalar(this.animalConfig.scale.blackPanther)
+            this.blackPanthers.push(panther)
         }
 
         for (let i = 0; i < numberOfDeers; i++) {
-            let position;
-            let attempts = 0;
-            let x, z, y;
-            let foundSuitableSpot = false;
-            const deerSpawnRange = this.animalConfig.spawnRange.deer;
+            let position
+            let attempts = 0
+            let x, z, y
+            let foundSuitableSpot = false
+            const deerSpawnRange = this.animalConfig.spawnRange.deer
 
             while(attempts < MAX_SPAWN_ATTEMPTS_PER_ANIMAL && !foundSuitableSpot) {
-                x = (Math.random() - 0.5) * deerSpawnRange * 2;
-                z = (Math.random() - 0.5) * deerSpawnRange * 2;
+                x = (Math.random() - 0.5) * deerSpawnRange * 2
+                z = (Math.random() - 0.5) * deerSpawnRange * 2
                 if(this.isPositionSuitable(x, z, elevationIterations, DEER_FLATNESS_CHECK_DISTANCE, DEER_MAX_ELEVATION_DIFFERENCE)) {
-                    foundSuitableSpot = true;
+                    foundSuitableSpot = true
                 }
-                attempts++;
+                attempts++
             }
             
-            y = this.terrainHelper.getElevation(x, z, elevationIterations) + deerModelVerticalOffset;
-            position = new THREE.Vector3(x, y, z);
+            y = this.terrainHelper.getElevation(x, z, elevationIterations) + deerModelVerticalOffset
+            position = new THREE.Vector3(x, y, z)
 
             if (!foundSuitableSpot) {
-                console.warn(`[View.js] Could not find a suitable spot for Deer ${i + 1} after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`);
+                console.warn(`[View.js] Could not find a suitable spot for Deer ${i + 1} after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
-            const deer = new Deer(this.scene, game.state.time, position);
+            const deer = new Deer(this.scene, game.state.time, position)
             // Apply scale from config after model loads  
-            if (deer.model) deer.model.scale.setScalar(this.animalConfig.scale.deer);
-            this.deers.push(deer);
+            if (deer.model) deer.model.scale.setScalar(this.animalConfig.scale.deer)
+            this.deers.push(deer)
         }
 
         for (let i = 0; i < numberOfSheeps; i++) {
-            let position;
-            let attempts = 0;
-            let x, z, y;
-            let foundSuitableSpot = false;
-            const sheepSpawnRange = this.animalConfig.spawnRange.sheep;
+            let position
+            let attempts = 0
+            let x, z, y
+            let foundSuitableSpot = false
+            const sheepSpawnRange = this.animalConfig.spawnRange.sheep
 
             while(attempts < MAX_SPAWN_ATTEMPTS_PER_ANIMAL && !foundSuitableSpot) {
-                x = (Math.random() - 0.5) * sheepSpawnRange * 2;
-                z = (Math.random() - 0.5) * sheepSpawnRange * 2;
+                x = (Math.random() - 0.5) * sheepSpawnRange * 2
+                z = (Math.random() - 0.5) * sheepSpawnRange * 2
                 if(this.isPositionSuitable(x, z, elevationIterations, SHEEP_FLATNESS_CHECK_DISTANCE, SHEEP_MAX_ELEVATION_DIFFERENCE)) {
-                    foundSuitableSpot = true;
+                    foundSuitableSpot = true
                 }
-                attempts++;
+                attempts++
             }
             
-            y = this.terrainHelper.getElevation(x, z, elevationIterations);
-            position = new THREE.Vector3(x, y, z);
+            y = this.terrainHelper.getElevation(x, z, elevationIterations)
+            position = new THREE.Vector3(x, y, z)
 
             if (!foundSuitableSpot) {
-                console.warn(`[View.js] Could not find a suitable spot for Sheep ${i + 1} after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`);
+                console.warn(`[View.js] Could not find a suitable spot for Sheep ${i + 1} after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
-            const sheep = new Sheep(this.scene, game.state.time, position);
+            const sheep = new Sheep(this.scene, game.state.time, position)
             // Apply scale from config after model loads
-            if (sheep.model) sheep.model.scale.setScalar(this.animalConfig.scale.sheep);
-            this.sheeps.push(sheep);
+            if (sheep.model) sheep.model.scale.setScalar(this.animalConfig.scale.sheep)
+            this.sheeps.push(sheep)
         }
 
         // Spawn wolves, stags, horses using config system
-        console.log('[View.js] About to call spawnSoundEnabledAnimals()');
+        console.log('[View.js] About to call spawnSoundEnabledAnimals()')
         try {
-            this.spawnSoundEnabledAnimals();
+            this.spawnSoundEnabledAnimals()
         } catch (error) {
-            console.error('[View.js] Error in spawnSoundEnabledAnimals:', error);
+            console.error('[View.js] Error in spawnSoundEnabledAnimals:', error)
         }
     }
 
@@ -1162,17 +1160,17 @@ export default class View
             // { dx: -flatnessCheckDistance, dz: -flatnessCheckDistance },
             // { dx: flatnessCheckDistance, dz: -flatnessCheckDistance },
             // { dx: -flatnessCheckDistance, dz: flatnessCheckDistance },
-        ];
+        ]
 
         for (const point of pointsToSample) {
-            const sampleX = x + point.dx;
-            const sampleZ = z + point.dz;
-            const sampleElevation = this.terrainHelper.getElevation(sampleX, sampleZ, elevationIterations);
+            const sampleX = x + point.dx
+            const sampleZ = z + point.dz
+            const sampleElevation = this.terrainHelper.getElevation(sampleX, sampleZ, elevationIterations)
             if (Math.abs(sampleElevation - centerElevation) > maxElevationDifference) {
-                return false; // Too steep
+                return false // Too steep
             }
         }
-        return true; // Area is considered flat enough
+        return true // Area is considered flat enough
     }
 
     isFarFromOthers(x, z, animals, minDistance) {
@@ -1287,35 +1285,35 @@ export default class View
         if (this.enableRain && this.rainEffect) this.rainEffect.update()
 
         for (const cow of this.cows) {
-            cow.update();
+            cow.update()
         }
 
         for (const bird of this.birds) {
-            bird.update();
+            bird.update()
         }
 
         for (const panther of this.blackPanthers) {
-            panther.update();
+            panther.update()
         }
 
         for (const deer of this.deers) {
-            deer.update();
+            deer.update()
         }
 
         for (const sheep of this.sheeps) {
-            sheep.update();
+            sheep.update()
         }
 
         for (const wolf of this.wolves) {
-            wolf.update();
+            wolf.update()
         }
 
         for (const stag of this.stags) {
-            stag.update();
+            stag.update()
         }
 
         for (const horse of this.horses) {
-            horse.update();
+            horse.update()
         }
 
         this.camera.update()
@@ -1329,227 +1327,227 @@ export default class View
 
     initBackgroundMusic() {
         if (!this.audioListener) {
-            console.warn('[View.js] No audioListener available for background music');
-            return;
+            console.warn('[View.js] No audioListener available for background music')
+            return
         }
 
-        console.log('[View.js] Initializing background music...');
-        console.log('[View.js] Audio context state:', this.audioListener.context.state);
-        console.log('[View.js] Audio context sample rate:', this.audioListener.context.sampleRate);
+        console.log('[View.js] Initializing background music...')
+        console.log('[View.js] Audio context state:', this.audioListener.context.state)
+        console.log('[View.js] Audio context sample rate:', this.audioListener.context.sampleRate)
         
-        const audioLoader = new THREE.AudioLoader();
+        const audioLoader = new THREE.AudioLoader()
         
         // Chọn loại audio dựa trên config
         if (this.backgroundMusicConfig.usePositionalAudio) {
-            console.log('[View.js] Using PositionalAudio for background music');
-            this.backgroundMusic = new THREE.PositionalAudio(this.audioListener);
+            console.log('[View.js] Using PositionalAudio for background music')
+            this.backgroundMusic = new THREE.PositionalAudio(this.audioListener)
         } else {
-            console.log('[View.js] Using Audio for background music');
-            this.backgroundMusic = new THREE.Audio(this.audioListener);
+            console.log('[View.js] Using Audio for background music')
+            this.backgroundMusic = new THREE.Audio(this.audioListener)
         }
 
         audioLoader.load('/sounds/soundBackground.mp3', (buffer) => {
-            console.log('[View.js] Background music loaded successfully');
-            console.log('[View.js] BG Music buffer - Sample Rate:', buffer.sampleRate, 'Duration:', buffer.duration, 'Channels:', buffer.numberOfChannels);
+            console.log('[View.js] Background music loaded successfully')
+            console.log('[View.js] BG Music buffer - Sample Rate:', buffer.sampleRate, 'Duration:', buffer.duration, 'Channels:', buffer.numberOfChannels)
             
             // Check for potential issues
             if (buffer.sampleRate !== this.audioListener.context.sampleRate) {
-                console.warn('[View.js] ⚠️ Sample rate mismatch between BG music and audio context!');
-                console.warn('[View.js] Buffer:', buffer.sampleRate, 'Hz, Context:', this.audioListener.context.sampleRate, 'Hz');
+                console.warn('[View.js] ⚠️ Sample rate mismatch between BG music and audio context!')
+                console.warn('[View.js] Buffer:', buffer.sampleRate, 'Hz, Context:', this.audioListener.context.sampleRate, 'Hz')
             }
             
-            this.backgroundMusic.setBuffer(buffer);
-            this.backgroundMusic.setLoop(true);
-            this.backgroundMusic.setVolume(this.backgroundMusicConfig.volume);
+            this.backgroundMusic.setBuffer(buffer)
+            this.backgroundMusic.setLoop(true)
+            this.backgroundMusic.setVolume(this.backgroundMusicConfig.volume)
             
             // Configure settings dựa trên loại audio
             if (this.backgroundMusicConfig.usePositionalAudio) {
                 // Configure như global audio (không bị ảnh hưởng bởi khoảng cách)
-                this.backgroundMusic.setRefDistance(10000); // Rất xa để volume không đổi
-                this.backgroundMusic.setMaxDistance(50000); // Rất xa
-                this.backgroundMusic.setRolloffFactor(0); // Không giảm theo khoảng cách
-                this.backgroundMusic.setDistanceModel('linear'); // Sử dụng linear model
-                this.backgroundMusic.setDirectionalCone(360, 360, 0); // Omnidirectional
+                this.backgroundMusic.setRefDistance(10000) // Rất xa để volume không đổi
+                this.backgroundMusic.setMaxDistance(50000) // Rất xa
+                this.backgroundMusic.setRolloffFactor(0) // Không giảm theo khoảng cách
+                this.backgroundMusic.setDistanceModel('linear') // Sử dụng linear model
+                this.backgroundMusic.setDirectionalCone(360, 360, 0) // Omnidirectional
                 
-                console.log('[View.js] Background music configured as pseudo-global PositionalAudio');
+                console.log('[View.js] Background music configured as pseudo-global PositionalAudio')
                 
                 // Attach to camera để follow player
-                this.camera.instance.add(this.backgroundMusic);
+                this.camera.instance.add(this.backgroundMusic)
             } else {
-                console.log('[View.js] Background music configured as standard Audio');
+                console.log('[View.js] Background music configured as standard Audio')
                 // Standard Audio không cần position settings
             }
             
             // Auto-play if enabled (after user interaction)
             if (this.backgroundMusicConfig.enabled) {
-                this.playBackgroundMusic();
+                this.playBackgroundMusic()
             }
         }, undefined, (error) => {
-            console.error('[View.js] Failed to load background music:', error);
-        });
+            console.error('[View.js] Failed to load background music:', error)
+        })
     }
 
     playBackgroundMusic() {
         if (!this.backgroundMusic) {
-            console.warn('[View.js] Background music not initialized');
-            return;
+            console.warn('[View.js] Background music not initialized')
+            return
         }
 
         // Try to resume audio context if suspended
         if (this.audioListener.context.state === 'suspended') {
-            console.log('[View.js] Resuming audio context for background music...');
+            console.log('[View.js] Resuming audio context for background music...')
             this.audioListener.context.resume().then(() => {
-                console.log('[View.js] Audio context resumed, playing background music');
-                this.backgroundMusic.play();
-                this.fadeInBackgroundMusic();
-            });
+                console.log('[View.js] Audio context resumed, playing background music')
+                this.backgroundMusic.play()
+                this.fadeInBackgroundMusic()
+            })
         } else {
-            console.log('[View.js] Playing background music');
-            this.backgroundMusic.play();
-            this.fadeInBackgroundMusic();
+            console.log('[View.js] Playing background music')
+            this.backgroundMusic.play()
+            this.fadeInBackgroundMusic()
         }
     }
 
     stopBackgroundMusic() {
         if (this.backgroundMusic && this.backgroundMusic.isPlaying) {
-            console.log('[View.js] Stopping background music');
+            console.log('[View.js] Stopping background music')
             this.fadeOutBackgroundMusic(() => {
-                this.backgroundMusic.stop();
-            });
+                this.backgroundMusic.stop()
+            })
         }
     }
 
     fadeInBackgroundMusic() {
-        if (!this.backgroundMusic) return;
+        if (!this.backgroundMusic) return
         
-        this.backgroundMusic.setVolume(0);
-        const targetVolume = this.backgroundMusicConfig.volume;
-        const duration = this.backgroundMusicConfig.fadeInDuration;
-        const steps = 50;
-        const stepVolume = targetVolume / steps;
-        const stepTime = duration / steps;
+        this.backgroundMusic.setVolume(0)
+        const targetVolume = this.backgroundMusicConfig.volume
+        const duration = this.backgroundMusicConfig.fadeInDuration
+        const steps = 50
+        const stepVolume = targetVolume / steps
+        const stepTime = duration / steps
 
-        let currentStep = 0;
+        let currentStep = 0
         const fadeInterval = setInterval(() => {
-            currentStep++;
-            const newVolume = Math.min(stepVolume * currentStep, targetVolume);
-            this.backgroundMusic.setVolume(newVolume);
+            currentStep++
+            const newVolume = Math.min(stepVolume * currentStep, targetVolume)
+            this.backgroundMusic.setVolume(newVolume)
             
             if (currentStep >= steps) {
-                clearInterval(fadeInterval);
-                console.log('[View.js] Background music fade in completed');
+                clearInterval(fadeInterval)
+                console.log('[View.js] Background music fade in completed')
             }
-        }, stepTime);
+        }, stepTime)
     }
 
     fadeOutBackgroundMusic(callback) {
-        if (!this.backgroundMusic) return;
+        if (!this.backgroundMusic) return
         
-        const currentVolume = this.backgroundMusic.getVolume();
-        const duration = this.backgroundMusicConfig.fadeOutDuration;
-        const steps = 30;
-        const stepVolume = currentVolume / steps;
-        const stepTime = duration / steps;
+        const currentVolume = this.backgroundMusic.getVolume()
+        const duration = this.backgroundMusicConfig.fadeOutDuration
+        const steps = 30
+        const stepVolume = currentVolume / steps
+        const stepTime = duration / steps
 
-        let currentStep = 0;
+        let currentStep = 0
         const fadeInterval = setInterval(() => {
-            currentStep++;
-            const newVolume = Math.max(currentVolume - (stepVolume * currentStep), 0);
-            this.backgroundMusic.setVolume(newVolume);
+            currentStep++
+            const newVolume = Math.max(currentVolume - (stepVolume * currentStep), 0)
+            this.backgroundMusic.setVolume(newVolume)
             
             if (currentStep >= steps) {
-                clearInterval(fadeInterval);
-                console.log('[View.js] Background music fade out completed');
-                if (callback) callback();
+                clearInterval(fadeInterval)
+                console.log('[View.js] Background music fade out completed')
+                if (callback) callback()
             }
-        }, stepTime);
+        }, stepTime)
     }
 
     toggleBackgroundMusic(enabled) {
-        this.backgroundMusicConfig.enabled = enabled;
+        this.backgroundMusicConfig.enabled = enabled
         if (enabled) {
-            this.playBackgroundMusic();
+            this.playBackgroundMusic()
         } else {
-            this.stopBackgroundMusic();
+            this.stopBackgroundMusic()
         }
     }
 
     setBackgroundMusicVolume(volume) {
-        this.backgroundMusicConfig.volume = volume;
+        this.backgroundMusicConfig.volume = volume
         if (this.backgroundMusic) {
-            this.backgroundMusic.setVolume(volume);
+            this.backgroundMusic.setVolume(volume)
         }
     }
 
     // Audio ducking for better mixing
     registerAnimalSound(animalType) {
-        this.activeAnimalSounds.add(animalType);
+        this.activeAnimalSounds.add(animalType)
         if (this.backgroundMusicConfig.duckingEnabled && this.backgroundMusic && this.backgroundMusic.isPlaying) {
-            console.log('[View.js] Ducking background music for', animalType);
-            this.backgroundMusic.setVolume(this.backgroundMusicConfig.duckingVolume);
+            console.log('[View.js] Ducking background music for', animalType)
+            this.backgroundMusic.setVolume(this.backgroundMusicConfig.duckingVolume)
         }
     }
 
     unregisterAnimalSound(animalType) {
-        this.activeAnimalSounds.delete(animalType);
+        this.activeAnimalSounds.delete(animalType)
         if (this.activeAnimalSounds.size === 0 && this.backgroundMusic && this.backgroundMusic.isPlaying) {
-            console.log('[View.js] Restoring background music volume');
-            this.backgroundMusic.setVolume(this.backgroundMusicConfig.volume);
+            console.log('[View.js] Restoring background music volume')
+            this.backgroundMusic.setVolume(this.backgroundMusicConfig.volume)
         }
     }
 
     // Force clear all audio contexts to avoid conflicts
     clearAudioConflicts() {
-        console.log('[View.js] Clearing audio conflicts...');
+        console.log('[View.js] Clearing audio conflicts...')
         
         // Stop all animal sounds temporarily
         for (const cow of this.cows) {
             if (cow.sound && cow.sound.isPlaying) {
-                cow.sound.stop();
-                cow.isPlaying = false;
+                cow.sound.stop()
+                cow.isPlaying = false
             }
         }
         
         for (const bird of this.birds) {
             if (bird.sound && bird.sound.isPlaying) {
-                bird.sound.stop();
-                bird.isPlaying = false;
+                bird.sound.stop()
+                bird.isPlaying = false
             }
         }
         
         // Clear active sounds tracking
-        this.activeAnimalSounds.clear();
+        this.activeAnimalSounds.clear()
         
         // Restore background music volume
         if (this.backgroundMusic) {
-            this.backgroundMusic.setVolume(this.backgroundMusicConfig.volume);
+            this.backgroundMusic.setVolume(this.backgroundMusicConfig.volume)
         }
         
-        console.log('[View.js] Audio conflicts cleared');
+        console.log('[View.js] Audio conflicts cleared')
     }
 
     setBackgroundMusicDebug() {
         const debug = Debug.getInstance()
         if (!debug.active) return
         
-        const musicFolder = debug.ui.getFolder('environment/background music');
+        const musicFolder = debug.ui.getFolder('environment/background music')
         
         // Enable/Disable toggle
         musicFolder.add(this.backgroundMusicConfig, 'enabled')
             .name('Enable Background Music')
-            .onChange((value) => this.toggleBackgroundMusic(value));
+            .onChange((value) => this.toggleBackgroundMusic(value))
         
         // Volume control
         musicFolder.add(this.backgroundMusicConfig, 'volume', 0, 1, 0.05)
             .name('Volume')
-            .onChange((value) => this.setBackgroundMusicVolume(value));
+            .onChange((value) => this.setBackgroundMusicVolume(value))
         
         // Fade controls
         musicFolder.add(this.backgroundMusicConfig, 'fadeInDuration', 500, 5000, 100)
-            .name('Fade In Duration (ms)');
+            .name('Fade In Duration (ms)')
         
         musicFolder.add(this.backgroundMusicConfig, 'fadeOutDuration', 500, 3000, 100)
-            .name('Fade Out Duration (ms)');
+            .name('Fade Out Duration (ms)')
         
         // Audio Ducking controls
         musicFolder.add(this.backgroundMusicConfig, 'duckingEnabled')
@@ -1557,35 +1555,35 @@ export default class View
             .onChange((value) => {
                 if (!value) {
                     // Restore volume if ducking is disabled
-                    this.backgroundMusic?.setVolume(this.backgroundMusicConfig.volume);
+                    this.backgroundMusic?.setVolume(this.backgroundMusicConfig.volume)
                 }
-            });
+            })
         
         musicFolder.add(this.backgroundMusicConfig, 'duckingVolume', 0, 0.5, 0.05)
-            .name('Ducking Volume');
+            .name('Ducking Volume')
         
         // Audio type toggle
         musicFolder.add(this.backgroundMusicConfig, 'usePositionalAudio')
             .name('Use PositionalAudio')
             .onChange((value) => {
-                console.log('[View.js] Switching audio type to:', value ? 'PositionalAudio' : 'Audio');
+                console.log('[View.js] Switching audio type to:', value ? 'PositionalAudio' : 'Audio')
                 // Restart background music với type mới
-                const wasPlaying = this.backgroundMusic?.isPlaying;
+                const wasPlaying = this.backgroundMusic?.isPlaying
                 if (this.backgroundMusic) {
-                    this.backgroundMusic.stop();
+                    this.backgroundMusic.stop()
                     if (this.backgroundMusicConfig.usePositionalAudio && this.camera.instance.children.includes(this.backgroundMusic)) {
-                        this.camera.instance.remove(this.backgroundMusic);
+                        this.camera.instance.remove(this.backgroundMusic)
                     }
                 }
                 
                 // Reinitialize với type mới
                 setTimeout(() => {
-                    this.initBackgroundMusic();
+                    this.initBackgroundMusic()
                     if (wasPlaying && this.backgroundMusicConfig.enabled) {
-                        setTimeout(() => this.playBackgroundMusic(), 500);
+                        setTimeout(() => this.playBackgroundMusic(), 500)
                     }
-                }, 100);
-            });
+                }, 100)
+            })
         
         // Manual controls
         const controls = {
@@ -1594,22 +1592,22 @@ export default class View
             testFadeIn: () => this.fadeInBackgroundMusic(),
             testFadeOut: () => this.fadeOutBackgroundMusic(),
             clearConflicts: () => this.clearAudioConflicts()
-        };
+        }
         
-        musicFolder.add(controls, 'play').name('Play Now');
-        musicFolder.add(controls, 'stop').name('Stop Now');
-        musicFolder.add(controls, 'testFadeIn').name('Test Fade In');
-        musicFolder.add(controls, 'testFadeOut').name('Test Fade Out');
-        musicFolder.add(controls, 'clearConflicts').name('Clear Audio Conflicts');
+        musicFolder.add(controls, 'play').name('Play Now')
+        musicFolder.add(controls, 'stop').name('Stop Now')
+        musicFolder.add(controls, 'testFadeIn').name('Test Fade In')
+        musicFolder.add(controls, 'testFadeOut').name('Test Fade Out')
+        musicFolder.add(controls, 'clearConflicts').name('Clear Audio Conflicts')
 
-        console.log('[View.js] Background music debug controls added');
+        console.log('[View.js] Background music debug controls added')
     }
 
     destroy()
     {
         // Stop background music when destroying
         if (this.backgroundMusic) {
-            this.backgroundMusic.stop();
+            this.backgroundMusic.stop()
         }
     }
 
@@ -1618,75 +1616,75 @@ export default class View
         if (!debug.active) return
         
         // Player Speed Controls
-        const playerFolder = debug.ui.getFolder('player');
-        const game = Game.getInstance();
+        const playerFolder = debug.ui.getFolder('player')
+        const game = Game.getInstance()
         const speedControls = {
             speedMultiplier: 1.0,
             turboBoost: false,
             toggleTurbo: () => {
-                const player = game.state.player;
-                player.toggleTurboBoost();
-                speedControls.turboBoost = player.turboBoostActive;
-                speedControls.speedMultiplier = player.speedMultiplier;
+                const player = game.state.player
+                player.toggleTurboBoost()
+                speedControls.turboBoost = player.turboBoostActive
+                speedControls.speedMultiplier = player.speedMultiplier
             },
             enable300Boost: () => {
-                const player = game.state.player;
-                player.enableTurboBoost();
-                speedControls.turboBoost = player.turboBoostActive;
-                speedControls.speedMultiplier = player.speedMultiplier;
+                const player = game.state.player
+                player.enableTurboBoost()
+                speedControls.turboBoost = player.turboBoostActive
+                speedControls.speedMultiplier = player.speedMultiplier
             },
             disableBoost: () => {
-                const player = game.state.player;
-                player.disableTurboBoost();
-                speedControls.turboBoost = player.turboBoostActive;
-                speedControls.speedMultiplier = player.speedMultiplier;
+                const player = game.state.player
+                player.disableTurboBoost()
+                speedControls.turboBoost = player.turboBoostActive
+                speedControls.speedMultiplier = player.speedMultiplier
             }
-        };
+        }
         
         playerFolder.add(speedControls, 'speedMultiplier', 0.1, 10, 0.1).name('Speed Multiplier').listen().onChange((value) => {
-            game.state.player.speedMultiplier = value;
-        });
+            game.state.player.speedMultiplier = value
+        })
         
-        playerFolder.add(speedControls, 'turboBoost').name('Turbo Boost Active').listen();
+        playerFolder.add(speedControls, 'turboBoost').name('Turbo Boost Active').listen()
         
-        playerFolder.add(speedControls, 'toggleTurbo').name('🚀 Toggle Turbo (300%)');
-        playerFolder.add(speedControls, 'enable300Boost').name('⚡ Enable 300% Speed');
-        playerFolder.add(speedControls, 'disableBoost').name('🏃 Normal Speed');
+        playerFolder.add(speedControls, 'toggleTurbo').name('🚀 Toggle Turbo (300%)')
+        playerFolder.add(speedControls, 'enable300Boost').name('⚡ Enable 300% Speed')
+        playerFolder.add(speedControls, 'disableBoost').name('🏃 Normal Speed')
         
-        const animalsFolder = debug.ui.getFolder('environment/animals');
+        const animalsFolder = debug.ui.getFolder('environment/animals')
 
         // Spawn Range
-        const spawnRangeFolder = animalsFolder.addFolder('spawn range');
-        spawnRangeFolder.add(this.animalConfig.spawnRange, 'cow', 10, 500, 1).name('Cow');
-        spawnRangeFolder.add(this.animalConfig.spawnRange, 'bird', 10, 500, 1).name('Bird');
-        spawnRangeFolder.add(this.animalConfig.spawnRange, 'wolf', 10, 500, 1).name('Wolf');
-        spawnRangeFolder.add(this.animalConfig.spawnRange, 'stag', 10, 500, 1).name('Stag');
-        spawnRangeFolder.add(this.animalConfig.spawnRange, 'horse', 10, 500, 1).name('Horse');
-        spawnRangeFolder.add(this.animalConfig.spawnRange, 'blackPanther', 10, 500, 1).name('Black Panther');
-        spawnRangeFolder.add(this.animalConfig.spawnRange, 'deer', 10, 500, 1).name('Deer');
-        spawnRangeFolder.add(this.animalConfig.spawnRange, 'sheep', 10, 500, 1).name('Sheep');
+        const spawnRangeFolder = animalsFolder.addFolder('spawn range')
+        spawnRangeFolder.add(this.animalConfig.spawnRange, 'cow', 10, 500, 1).name('Cow')
+        spawnRangeFolder.add(this.animalConfig.spawnRange, 'bird', 10, 500, 1).name('Bird')
+        spawnRangeFolder.add(this.animalConfig.spawnRange, 'wolf', 10, 500, 1).name('Wolf')
+        spawnRangeFolder.add(this.animalConfig.spawnRange, 'stag', 10, 500, 1).name('Stag')
+        spawnRangeFolder.add(this.animalConfig.spawnRange, 'horse', 10, 500, 1).name('Horse')
+        spawnRangeFolder.add(this.animalConfig.spawnRange, 'blackPanther', 10, 500, 1).name('Black Panther')
+        spawnRangeFolder.add(this.animalConfig.spawnRange, 'deer', 10, 500, 1).name('Deer')
+        spawnRangeFolder.add(this.animalConfig.spawnRange, 'sheep', 10, 500, 1).name('Sheep')
 
         // Number
-        const numberFolder = animalsFolder.addFolder('number');
-        numberFolder.add(this.animalConfig.number, 'cow', 0, 20, 1).name('Cow');
-        numberFolder.add(this.animalConfig.number, 'bird', 0, 50, 1).name('Bird');
-        numberFolder.add(this.animalConfig.number, 'wolf', 0, 10, 1).name('Wolf');
-        numberFolder.add(this.animalConfig.number, 'stag', 0, 20, 1).name('Stag');
-        numberFolder.add(this.animalConfig.number, 'horse', 0, 20, 1).name('Horse');
-        numberFolder.add(this.animalConfig.number, 'blackPanther', 0, 10, 1).name('Black Panther');
-        numberFolder.add(this.animalConfig.number, 'deer', 0, 20, 1).name('Deer');
-        numberFolder.add(this.animalConfig.number, 'sheep', 0, 30, 1).name('Sheep');
+        const numberFolder = animalsFolder.addFolder('number')
+        numberFolder.add(this.animalConfig.number, 'cow', 0, 20, 1).name('Cow')
+        numberFolder.add(this.animalConfig.number, 'bird', 0, 50, 1).name('Bird')
+        numberFolder.add(this.animalConfig.number, 'wolf', 0, 10, 1).name('Wolf')
+        numberFolder.add(this.animalConfig.number, 'stag', 0, 20, 1).name('Stag')
+        numberFolder.add(this.animalConfig.number, 'horse', 0, 20, 1).name('Horse')
+        numberFolder.add(this.animalConfig.number, 'blackPanther', 0, 10, 1).name('Black Panther')
+        numberFolder.add(this.animalConfig.number, 'deer', 0, 20, 1).name('Deer')
+        numberFolder.add(this.animalConfig.number, 'sheep', 0, 30, 1).name('Sheep')
 
         // Scale
-        const scaleFolder = animalsFolder.addFolder('scale');
-        scaleFolder.add(this.animalConfig.scale, 'cow', 0.1, 5, 0.01).name('Cow');
-        scaleFolder.add(this.animalConfig.scale, 'bird', 0.1, 5, 0.01).name('Bird');
-        scaleFolder.add(this.animalConfig.scale, 'wolf', 0.1, 5, 0.01).name('Wolf');
-        scaleFolder.add(this.animalConfig.scale, 'stag', 0.1, 5, 0.01).name('Stag');
-        scaleFolder.add(this.animalConfig.scale, 'horse', 0.1, 5, 0.01).name('Horse');
-        scaleFolder.add(this.animalConfig.scale, 'blackPanther', 0.1, 5, 0.01).name('Black Panther');
-        scaleFolder.add(this.animalConfig.scale, 'deer', 0.1, 5, 0.01).name('Deer');
-        scaleFolder.add(this.animalConfig.scale, 'sheep', 0.1, 5, 0.01).name('Sheep');
+        const scaleFolder = animalsFolder.addFolder('scale')
+        scaleFolder.add(this.animalConfig.scale, 'cow', 0.1, 5, 0.01).name('Cow')
+        scaleFolder.add(this.animalConfig.scale, 'bird', 0.1, 5, 0.01).name('Bird')
+        scaleFolder.add(this.animalConfig.scale, 'wolf', 0.1, 5, 0.01).name('Wolf')
+        scaleFolder.add(this.animalConfig.scale, 'stag', 0.1, 5, 0.01).name('Stag')
+        scaleFolder.add(this.animalConfig.scale, 'horse', 0.1, 5, 0.01).name('Horse')
+        scaleFolder.add(this.animalConfig.scale, 'blackPanther', 0.1, 5, 0.01).name('Black Panther')
+        scaleFolder.add(this.animalConfig.scale, 'deer', 0.1, 5, 0.01).name('Deer')
+        scaleFolder.add(this.animalConfig.scale, 'sheep', 0.1, 5, 0.01).name('Sheep')
 
         // Apply button
         animalsFolder.add({ apply: () => this.applyAnimalConfig() }, 'apply').name('Apply')
@@ -1703,83 +1701,85 @@ export default class View
             this.animalConfig.sound.horse = value
             // Save to localStorage
             try {
-                localStorage.setItem('globalAnimalSound', JSON.stringify(value));
-            } catch (e) {}
+                localStorage.setItem('globalAnimalSound', JSON.stringify(value))
+            } catch (e) {
+                // Ignore localStorage errors
+            }
             // Reload the page
-            window.location.reload();
-        });
+            window.location.reload()
+        })
 
         // Sound Settings
-        const soundSettingsFolder = animalsFolder.addFolder('sound settings');
+        const soundSettingsFolder = animalsFolder.addFolder('sound settings')
         
         // Sound Delay
-        const delayFolder = soundSettingsFolder.addFolder('delay (ms)');
-        delayFolder.add(this.soundConfig.delay, 'cow', 1000, 10000, 100).name('Cow').onChange(() => this.applySoundConfig());
-        delayFolder.add(this.soundConfig.delay, 'bird', 1000, 10000, 100).name('Bird').onChange(() => this.applySoundConfig());
-        delayFolder.add(this.soundConfig.delay, 'wolf', 1000, 10000, 100).name('Wolf').onChange(() => this.applySoundConfig());
-        delayFolder.add(this.soundConfig.delay, 'stag', 1000, 10000, 100).name('Stag').onChange(() => this.applySoundConfig());
-        delayFolder.add(this.soundConfig.delay, 'horse', 1000, 10000, 100).name('Horse').onChange(() => this.applySoundConfig());
+        const delayFolder = soundSettingsFolder.addFolder('delay (ms)')
+        delayFolder.add(this.soundConfig.delay, 'cow', 1000, 10000, 100).name('Cow').onChange(() => this.applySoundConfig())
+        delayFolder.add(this.soundConfig.delay, 'bird', 1000, 10000, 100).name('Bird').onChange(() => this.applySoundConfig())
+        delayFolder.add(this.soundConfig.delay, 'wolf', 1000, 10000, 100).name('Wolf').onChange(() => this.applySoundConfig())
+        delayFolder.add(this.soundConfig.delay, 'stag', 1000, 10000, 100).name('Stag').onChange(() => this.applySoundConfig())
+        delayFolder.add(this.soundConfig.delay, 'horse', 1000, 10000, 100).name('Horse').onChange(() => this.applySoundConfig())
 
         // Sound Duration
-        const durationFolder = soundSettingsFolder.addFolder('duration (ms)');
-        durationFolder.add(this.soundConfig.duration, 'cow', 500, 5000, 100).name('Cow').onChange(() => this.applySoundConfig());
-        durationFolder.add(this.soundConfig.duration, 'bird', 500, 5000, 100).name('Bird').onChange(() => this.applySoundConfig());
-        durationFolder.add(this.soundConfig.duration, 'wolf', 500, 5000, 100).name('Wolf').onChange(() => this.applySoundConfig());
-        durationFolder.add(this.soundConfig.duration, 'stag', 500, 5000, 100).name('Stag').onChange(() => this.applySoundConfig());
-        durationFolder.add(this.soundConfig.duration, 'horse', 500, 5000, 100).name('Horse').onChange(() => this.applySoundConfig());
+        const durationFolder = soundSettingsFolder.addFolder('duration (ms)')
+        durationFolder.add(this.soundConfig.duration, 'cow', 500, 5000, 100).name('Cow').onChange(() => this.applySoundConfig())
+        durationFolder.add(this.soundConfig.duration, 'bird', 500, 5000, 100).name('Bird').onChange(() => this.applySoundConfig())
+        durationFolder.add(this.soundConfig.duration, 'wolf', 500, 5000, 100).name('Wolf').onChange(() => this.applySoundConfig())
+        durationFolder.add(this.soundConfig.duration, 'stag', 500, 5000, 100).name('Stag').onChange(() => this.applySoundConfig())
+        durationFolder.add(this.soundConfig.duration, 'horse', 500, 5000, 100).name('Horse').onChange(() => this.applySoundConfig())
 
         // Volume
-        const volumeFolder = soundSettingsFolder.addFolder('volume');
-        volumeFolder.add(this.soundConfig.volume, 'cow', 0, 1, 0.05).name('Cow').onChange(() => this.applySoundConfig());
-        volumeFolder.add(this.soundConfig.volume, 'bird', 0, 1, 0.05).name('Bird').onChange(() => this.applySoundConfig());
-        volumeFolder.add(this.soundConfig.volume, 'wolf', 0, 1, 0.05).name('Wolf').onChange(() => this.applySoundConfig());
-        volumeFolder.add(this.soundConfig.volume, 'stag', 0, 1, 0.05).name('Stag').onChange(() => this.applySoundConfig());
-        volumeFolder.add(this.soundConfig.volume, 'horse', 0, 1, 0.05).name('Horse').onChange(() => this.applySoundConfig());
+        const volumeFolder = soundSettingsFolder.addFolder('volume')
+        volumeFolder.add(this.soundConfig.volume, 'cow', 0, 1, 0.05).name('Cow').onChange(() => this.applySoundConfig())
+        volumeFolder.add(this.soundConfig.volume, 'bird', 0, 1, 0.05).name('Bird').onChange(() => this.applySoundConfig())
+        volumeFolder.add(this.soundConfig.volume, 'wolf', 0, 1, 0.05).name('Wolf').onChange(() => this.applySoundConfig())
+        volumeFolder.add(this.soundConfig.volume, 'stag', 0, 1, 0.05).name('Stag').onChange(() => this.applySoundConfig())
+        volumeFolder.add(this.soundConfig.volume, 'horse', 0, 1, 0.05).name('Horse').onChange(() => this.applySoundConfig())
 
         // Ref Distance
-        const refDistanceFolder = soundSettingsFolder.addFolder('ref distance');
-        refDistanceFolder.add(this.soundConfig.refDistance, 'cow', 1, 10, 0.5).name('Cow').onChange(() => this.applySoundConfig());
-        refDistanceFolder.add(this.soundConfig.refDistance, 'bird', 1, 10, 0.5).name('Bird').onChange(() => this.applySoundConfig());
-        refDistanceFolder.add(this.soundConfig.refDistance, 'wolf', 1, 10, 0.5).name('Wolf').onChange(() => this.applySoundConfig());
-        refDistanceFolder.add(this.soundConfig.refDistance, 'stag', 1, 10, 0.5).name('Stag').onChange(() => this.applySoundConfig());
-        refDistanceFolder.add(this.soundConfig.refDistance, 'horse', 1, 10, 0.5).name('Horse').onChange(() => this.applySoundConfig());
+        const refDistanceFolder = soundSettingsFolder.addFolder('ref distance')
+        refDistanceFolder.add(this.soundConfig.refDistance, 'cow', 1, 10, 0.5).name('Cow').onChange(() => this.applySoundConfig())
+        refDistanceFolder.add(this.soundConfig.refDistance, 'bird', 1, 10, 0.5).name('Bird').onChange(() => this.applySoundConfig())
+        refDistanceFolder.add(this.soundConfig.refDistance, 'wolf', 1, 10, 0.5).name('Wolf').onChange(() => this.applySoundConfig())
+        refDistanceFolder.add(this.soundConfig.refDistance, 'stag', 1, 10, 0.5).name('Stag').onChange(() => this.applySoundConfig())
+        refDistanceFolder.add(this.soundConfig.refDistance, 'horse', 1, 10, 0.5).name('Horse').onChange(() => this.applySoundConfig())
 
         // Max Distance
-        const maxDistanceFolder = soundSettingsFolder.addFolder('max distance');
-        maxDistanceFolder.add(this.soundConfig.maxDistance, 'cow', 5, 50, 1).name('Cow').onChange(() => this.applySoundConfig());
-        maxDistanceFolder.add(this.soundConfig.maxDistance, 'bird', 5, 50, 1).name('Bird').onChange(() => this.applySoundConfig());
-        maxDistanceFolder.add(this.soundConfig.maxDistance, 'wolf', 5, 50, 1).name('Wolf').onChange(() => this.applySoundConfig());
-        maxDistanceFolder.add(this.soundConfig.maxDistance, 'stag', 5, 50, 1).name('Stag').onChange(() => this.applySoundConfig());
-        maxDistanceFolder.add(this.soundConfig.maxDistance, 'horse', 5, 50, 1).name('Horse').onChange(() => this.applySoundConfig());
+        const maxDistanceFolder = soundSettingsFolder.addFolder('max distance')
+        maxDistanceFolder.add(this.soundConfig.maxDistance, 'cow', 5, 50, 1).name('Cow').onChange(() => this.applySoundConfig())
+        maxDistanceFolder.add(this.soundConfig.maxDistance, 'bird', 5, 50, 1).name('Bird').onChange(() => this.applySoundConfig())
+        maxDistanceFolder.add(this.soundConfig.maxDistance, 'wolf', 5, 50, 1).name('Wolf').onChange(() => this.applySoundConfig())
+        maxDistanceFolder.add(this.soundConfig.maxDistance, 'stag', 5, 50, 1).name('Stag').onChange(() => this.applySoundConfig())
+        maxDistanceFolder.add(this.soundConfig.maxDistance, 'horse', 5, 50, 1).name('Horse').onChange(() => this.applySoundConfig())
 
         // Rolloff Factor
-        const rolloffFolder = soundSettingsFolder.addFolder('rolloff factor');
-        rolloffFolder.add(this.soundConfig.rolloffFactor, 'cow', 0.5, 5, 0.1).name('Cow').onChange(() => this.applySoundConfig());
-        rolloffFolder.add(this.soundConfig.rolloffFactor, 'bird', 0.5, 5, 0.1).name('Bird').onChange(() => this.applySoundConfig());
-        rolloffFolder.add(this.soundConfig.rolloffFactor, 'wolf', 0.5, 5, 0.1).name('Wolf').onChange(() => this.applySoundConfig());
-        rolloffFolder.add(this.soundConfig.rolloffFactor, 'stag', 0.5, 5, 0.1).name('Stag').onChange(() => this.applySoundConfig());
-        rolloffFolder.add(this.soundConfig.rolloffFactor, 'horse', 0.5, 5, 0.1).name('Horse').onChange(() => this.applySoundConfig());
+        const rolloffFolder = soundSettingsFolder.addFolder('rolloff factor')
+        rolloffFolder.add(this.soundConfig.rolloffFactor, 'cow', 0.5, 5, 0.1).name('Cow').onChange(() => this.applySoundConfig())
+        rolloffFolder.add(this.soundConfig.rolloffFactor, 'bird', 0.5, 5, 0.1).name('Bird').onChange(() => this.applySoundConfig())
+        rolloffFolder.add(this.soundConfig.rolloffFactor, 'wolf', 0.5, 5, 0.1).name('Wolf').onChange(() => this.applySoundConfig())
+        rolloffFolder.add(this.soundConfig.rolloffFactor, 'stag', 0.5, 5, 0.1).name('Stag').onChange(() => this.applySoundConfig())
+        rolloffFolder.add(this.soundConfig.rolloffFactor, 'horse', 0.5, 5, 0.1).name('Horse').onChange(() => this.applySoundConfig())
     }
 
     applyAnimalConfig()
     {
         // Remove old animals from scene
-        for (const cow of this.cows) if (cow.model) this.scene.remove(cow.model);
-        for (const bird of this.birds) if (bird.model) this.scene.remove(bird.model);
-        for (const panther of this.blackPanthers) if (panther.model) this.scene.remove(panther.model);
-        for (const deer of this.deers) if (deer.model) this.scene.remove(deer.model);
-        for (const sheep of this.sheeps) if (sheep.model) this.scene.remove(sheep.model);
-        for (const wolf of this.wolves) if (wolf.model) this.scene.remove(wolf.model);
-        for (const stag of this.stags) if (stag.model) this.scene.remove(stag.model);
-        for (const horse of this.horses) if (horse.model) this.scene.remove(horse.model);
-        this.cows = [];
-        this.birds = [];
-        this.blackPanthers = [];
-        this.deers = [];
-        this.sheeps = [];
-        this.wolves = [];
-        this.stags = [];
-        this.horses = [];
+        for (const cow of this.cows) if (cow.model) this.scene.remove(cow.model)
+        for (const bird of this.birds) if (bird.model) this.scene.remove(bird.model)
+        for (const panther of this.blackPanthers) if (panther.model) this.scene.remove(panther.model)
+        for (const deer of this.deers) if (deer.model) this.scene.remove(deer.model)
+        for (const sheep of this.sheeps) if (sheep.model) this.scene.remove(sheep.model)
+        for (const wolf of this.wolves) if (wolf.model) this.scene.remove(wolf.model)
+        for (const stag of this.stags) if (stag.model) this.scene.remove(stag.model)
+        for (const horse of this.horses) if (horse.model) this.scene.remove(horse.model)
+        this.cows = []
+        this.birds = []
+        this.blackPanthers = []
+        this.deers = []
+        this.sheeps = []
+        this.wolves = []
+        this.stags = []
+        this.horses = []
 
         // Spawn new animals with config
         this.spawnAnimalsByConfig()
@@ -1827,221 +1827,220 @@ export default class View
         // Update sound config cho tất cả animals hiện tại
         for (const cow of this.cows) {
             if (cow.sound) {
-                cow.sound.setVolume(this.soundConfig.volume.cow);
-                cow.sound.setRefDistance(this.soundConfig.refDistance.cow);
-                cow.sound.setMaxDistance(this.soundConfig.maxDistance.cow);
-                cow.sound.setRolloffFactor(this.soundConfig.rolloffFactor.cow);
+                cow.sound.setVolume(this.soundConfig.volume.cow)
+                cow.sound.setRefDistance(this.soundConfig.refDistance.cow)
+                cow.sound.setMaxDistance(this.soundConfig.maxDistance.cow)
+                cow.sound.setRolloffFactor(this.soundConfig.rolloffFactor.cow)
             }
             // Update delay và duration
-            cow.soundDelay = this.soundConfig.delay.cow;
-            cow.soundDuration = this.soundConfig.duration.cow;
+            cow.soundDelay = this.soundConfig.delay.cow
+            cow.soundDuration = this.soundConfig.duration.cow
         }
 
         for (const bird of this.birds) {
             if (bird.sound) {
-                bird.sound.setVolume(this.soundConfig.volume.bird);
-                bird.sound.setRefDistance(this.soundConfig.refDistance.bird);
-                bird.sound.setMaxDistance(this.soundConfig.maxDistance.bird);
-                bird.sound.setRolloffFactor(this.soundConfig.rolloffFactor.bird);
+                bird.sound.setVolume(this.soundConfig.volume.bird)
+                bird.sound.setRefDistance(this.soundConfig.refDistance.bird)
+                bird.sound.setMaxDistance(this.soundConfig.maxDistance.bird)
+                bird.sound.setRolloffFactor(this.soundConfig.rolloffFactor.bird)
             }
-            bird.soundDelay = this.soundConfig.delay.bird;
-            bird.soundDuration = this.soundConfig.duration.bird;
+            bird.soundDelay = this.soundConfig.delay.bird
+            bird.soundDuration = this.soundConfig.duration.bird
         }
 
         for (const wolf of this.wolves) {
             if (wolf.sound) {
-                wolf.sound.setVolume(this.soundConfig.volume.wolf);
-                wolf.sound.setRefDistance(this.soundConfig.refDistance.wolf);
-                wolf.sound.setMaxDistance(this.soundConfig.maxDistance.wolf);
-                wolf.sound.setRolloffFactor(this.soundConfig.rolloffFactor.wolf);
+                wolf.sound.setVolume(this.soundConfig.volume.wolf)
+                wolf.sound.setRefDistance(this.soundConfig.refDistance.wolf)
+                wolf.sound.setMaxDistance(this.soundConfig.maxDistance.wolf)
+                wolf.sound.setRolloffFactor(this.soundConfig.rolloffFactor.wolf)
             }
-            wolf.soundDelay = this.soundConfig.delay.wolf;
-            wolf.soundDuration = this.soundConfig.duration.wolf;
+            wolf.soundDelay = this.soundConfig.delay.wolf
+            wolf.soundDuration = this.soundConfig.duration.wolf
         }
 
         for (const stag of this.stags) {
             if (stag.sound) {
-                stag.sound.setVolume(this.soundConfig.volume.stag);
-                stag.sound.setRefDistance(this.soundConfig.refDistance.stag);
-                stag.sound.setMaxDistance(this.soundConfig.maxDistance.stag);
-                stag.sound.setRolloffFactor(this.soundConfig.rolloffFactor.stag);
+                stag.sound.setVolume(this.soundConfig.volume.stag)
+                stag.sound.setRefDistance(this.soundConfig.refDistance.stag)
+                stag.sound.setMaxDistance(this.soundConfig.maxDistance.stag)
+                stag.sound.setRolloffFactor(this.soundConfig.rolloffFactor.stag)
             }
-            stag.soundDelay = this.soundConfig.delay.stag;
-            stag.soundDuration = this.soundConfig.duration.stag;
+            stag.soundDelay = this.soundConfig.delay.stag
+            stag.soundDuration = this.soundConfig.duration.stag
         }
 
         for (const horse of this.horses) {
             if (horse.sound) {
-                horse.sound.setVolume(this.soundConfig.volume.horse);
-                horse.sound.setRefDistance(this.soundConfig.refDistance.horse);
-                horse.sound.setMaxDistance(this.soundConfig.maxDistance.horse);
-                horse.sound.setRolloffFactor(this.soundConfig.rolloffFactor.horse);
+                horse.sound.setVolume(this.soundConfig.volume.horse)
+                horse.sound.setRefDistance(this.soundConfig.refDistance.horse)
+                horse.sound.setMaxDistance(this.soundConfig.maxDistance.horse)
+                horse.sound.setRolloffFactor(this.soundConfig.rolloffFactor.horse)
             }
-            horse.soundDelay = this.soundConfig.delay.horse;
-            horse.soundDuration = this.soundConfig.duration.horse;
+            horse.soundDelay = this.soundConfig.delay.horse
+            horse.soundDuration = this.soundConfig.duration.horse
         }
 
-        console.log('[View.js] Sound config applied to all animals');
+        console.log('[View.js] Sound config applied to all animals')
     }
 
     spawnSoundEnabledAnimals() {
-        console.log(`[View.js] Starting spawnSoundEnabledAnimals()`);
-        const playerPos = Game.getInstance().state.player.position.current;
-        const time = Date.now() / 1000;
+        console.log('[View.js] Starting spawnSoundEnabledAnimals()')
+        const time = Date.now() / 1000
         
         // Wolves
-        console.log(`[View.js] Spawning ${this.animalConfig.number.wolf} wolves...`);
+        console.log(`[View.js] Spawning ${this.animalConfig.number.wolf} wolves...`)
         for (let i = 0; i < this.animalConfig.number.wolf; i++) {
-            const range = this.animalConfig.spawnRange.wolf;
-            let x, z, y;
-            let found = false;
+            const range = this.animalConfig.spawnRange.wolf
+            let x, z, y
+            let found = false
             for (let attempt = 0; attempt < MAX_SPAWN_ATTEMPTS_PER_ANIMAL; attempt++) {
-                x = (Math.random() - 0.5) * range * 2;
-                z = (Math.random() - 0.5) * range * 2;
+                x = (Math.random() - 0.5) * range * 2
+                z = (Math.random() - 0.5) * range * 2
                 if (
                     this.isPositionSuitable(x, z, Game.getInstance().state.terrains.maxIterations, PANTHER_FLATNESS_CHECK_DISTANCE, PANTHER_MAX_ELEVATION_DIFFERENCE) &&
                     this.isFarFromOthers(x, z, this.wolves, 3)
                 ) {
-                    found = true;
-                    break;
+                    found = true
+                    break
                 }
             }
-            y = this.terrainHelper.getElevation(x, z, Game.getInstance().state.terrains.maxIterations) + 0.5;
+            y = this.terrainHelper.getElevation(x, z, Game.getInstance().state.terrains.maxIterations) + 0.5
             if (!found) {
-                console.warn(`[View.js] Could not find a flat spot for Wolf after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`);
+                console.warn(`[View.js] Could not find a flat spot for Wolf after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
             try {
-                const wolf = new Wolf(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.wolf, this.soundConfig);
-                if (wolf.model) wolf.model.scale.setScalar(this.animalConfig.scale.wolf);
-                this.wolves.push(wolf);
-                console.log(`[View.js] Wolf ${i} created successfully`);
+                const wolf = new Wolf(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.wolf, this.soundConfig)
+                if (wolf.model) wolf.model.scale.setScalar(this.animalConfig.scale.wolf)
+                this.wolves.push(wolf)
+                console.log(`[View.js] Wolf ${i} created successfully`)
             } catch (error) {
-                console.error(`[View.js] Error creating Wolf ${i}:`, error);
+                console.error(`[View.js] Error creating Wolf ${i}:`, error)
             }
         }
         
         // Stags
         for (let i = 0; i < this.animalConfig.number.stag; i++) {
-            const range = this.animalConfig.spawnRange.stag;
-            let x, z, y;
-            let found = false;
+            const range = this.animalConfig.spawnRange.stag
+            let x, z, y
+            let found = false
             for (let attempt = 0; attempt < MAX_SPAWN_ATTEMPTS_PER_ANIMAL; attempt++) {
-                x = (Math.random() - 0.5) * range * 2;
-                z = (Math.random() - 0.5) * range * 2;
+                x = (Math.random() - 0.5) * range * 2
+                z = (Math.random() - 0.5) * range * 2
                 if (
                     this.isPositionSuitable(x, z, Game.getInstance().state.terrains.maxIterations, STAG_FLATNESS_CHECK_DISTANCE, STAG_MAX_ELEVATION_DIFFERENCE) &&
                     this.isFarFromOthers(x, z, this.stags, 3)
                 ) {
-                    found = true;
-                    break;
+                    found = true
+                    break
                 }
             }
-            y = this.terrainHelper.getElevation(x, z, Game.getInstance().state.terrains.maxIterations) + 0.5;
+            y = this.terrainHelper.getElevation(x, z, Game.getInstance().state.terrains.maxIterations) + 0.5
             if (!found) {
-                console.warn(`[View.js] Could not find a flat spot for Stag after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`);
+                console.warn(`[View.js] Could not find a flat spot for Stag after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
             try {
-                const stag = new Stag(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.stag, this.soundConfig);
-                if (stag.model) stag.model.scale.setScalar(this.animalConfig.scale.stag);
-                this.stags.push(stag);
-                console.log(`[View.js] Stag ${i} created successfully`);
+                const stag = new Stag(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.stag, this.soundConfig)
+                if (stag.model) stag.model.scale.setScalar(this.animalConfig.scale.stag)
+                this.stags.push(stag)
+                console.log(`[View.js] Stag ${i} created successfully`)
             } catch (error) {
-                console.error(`[View.js] Error creating Stag ${i}:`, error);
+                console.error(`[View.js] Error creating Stag ${i}:`, error)
             }
         }
         
         // Horses
         for (let i = 0; i < this.animalConfig.number.horse; i++) {
-            const range = this.animalConfig.spawnRange.horse;
-            let x, z, y;
-            let found = false;
+            const range = this.animalConfig.spawnRange.horse
+            let x, z, y
+            let found = false
             for (let attempt = 0; attempt < MAX_SPAWN_ATTEMPTS_PER_ANIMAL; attempt++) {
-                x = (Math.random() - 0.5) * range * 2;
-                z = (Math.random() - 0.5) * range * 2;
+                x = (Math.random() - 0.5) * range * 2
+                z = (Math.random() - 0.5) * range * 2
                 if (
                     this.isPositionSuitable(x, z, Game.getInstance().state.terrains.maxIterations, HORSE_FLATNESS_CHECK_DISTANCE, HORSE_MAX_ELEVATION_DIFFERENCE) &&
                     this.isFarFromOthers(x, z, this.horses, 3)
                 ) {
-                    found = true;
-                    break;
+                    found = true
+                    break
                 }
             }
-            y = this.terrainHelper.getElevation(x, z, Game.getInstance().state.terrains.maxIterations);
+            y = this.terrainHelper.getElevation(x, z, Game.getInstance().state.terrains.maxIterations)
             if (!found) {
-                console.warn(`[View.js] Could not find a flat spot for Horse after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`);
+                console.warn(`[View.js] Could not find a flat spot for Horse after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
             try {
-                const horse = new Horse(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.horse, this.soundConfig);
-                if (horse.model) horse.model.scale.setScalar(this.animalConfig.scale.horse);
-                this.horses.push(horse);
-                console.log(`[View.js] Horse ${i} created successfully`);
+                const horse = new Horse(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.horse, this.soundConfig)
+                if (horse.model) horse.model.scale.setScalar(this.animalConfig.scale.horse)
+                this.horses.push(horse)
+                console.log(`[View.js] Horse ${i} created successfully`)
             } catch (error) {
-                console.error(`[View.js] Error creating Horse ${i}:`, error);
+                console.error(`[View.js] Error creating Horse ${i}:`, error)
             }
         }
         
-        console.log('[View.js] Sound-enabled animals spawned: Wolves(' + this.wolves.length + '), Stags(' + this.stags.length + '), Horses(' + this.horses.length + ')');
+        console.log('[View.js] Sound-enabled animals spawned: Wolves(' + this.wolves.length + '), Stags(' + this.stags.length + '), Horses(' + this.horses.length + ')')
         
         // Enhanced debug logging for sound-enabled animals
         this.wolves.forEach((wolf, i) => {
-            console.log(`[View.js] Wolf ${i} created at:`, wolf.initialPosition, 'Sound enabled:', wolf.enableSoundOnLoad);
-        });
+            console.log(`[View.js] Wolf ${i} created at:`, wolf.initialPosition, 'Sound enabled:', wolf.enableSoundOnLoad)
+        })
         this.stags.forEach((stag, i) => {
-            console.log(`[View.js] Stag ${i} created at:`, stag.initialPosition, 'Sound enabled:', stag.enableSoundOnLoad);
-        });
+            console.log(`[View.js] Stag ${i} created at:`, stag.initialPosition, 'Sound enabled:', stag.enableSoundOnLoad)
+        })
         this.horses.forEach((horse, i) => {
-            console.log(`[View.js] Horse ${i} created at:`, horse.initialPosition, 'Sound enabled:', horse.enableSoundOnLoad);
-        });
+            console.log(`[View.js] Horse ${i} created at:`, horse.initialPosition, 'Sound enabled:', horse.enableSoundOnLoad)
+        })
     }
 
     spawnAnimalsByConfig() {
-        const elevationIterations = Game.getInstance().state.terrains.maxIterations;
-        const time = Game.getInstance().state.time;
-        const minDistance = 3;
+        const elevationIterations = Game.getInstance().state.terrains.maxIterations
+        const time = Game.getInstance().state.time
+        const minDistance = 3
         // Cows
         for (let i = 0; i < this.animalConfig.number.cow; i++) {
-            const range = this.animalConfig.spawnRange.cow;
-            let x, z, y;
-            let found = false;
+            const range = this.animalConfig.spawnRange.cow
+            let x, z, y
+            let found = false
             for (let attempt = 0; attempt < MAX_SPAWN_ATTEMPTS_PER_ANIMAL; attempt++) {
-                x = (Math.random() - 0.5) * range * 2;
-                z = (Math.random() - 0.5) * range * 2;
+                x = (Math.random() - 0.5) * range * 2
+                z = (Math.random() - 0.5) * range * 2
                 if (
                     this.isPositionSuitable(x, z, Game.getInstance().state.terrains.maxIterations, STAG_FLATNESS_CHECK_DISTANCE, STAG_MAX_ELEVATION_DIFFERENCE) &&
                     this.isFarFromOthers(x, z, this.stags, 3)
                 ) {
-                    found = true;
-                    break;
+                    found = true
+                    break
                 }
             }
-            y = this.terrainHelper.getElevation(x, z, elevationIterations) + 0.75;
+            y = this.terrainHelper.getElevation(x, z, elevationIterations) + 0.75
             if (!found) {
-                console.warn(`[View.js] Could not find a flat spot for Cow after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`);
+                console.warn(`[View.js] Could not find a flat spot for Cow after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
-            const cow = new Cow(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.cow, this.soundConfig);
-            if (cow.model) cow.model.scale.setScalar(this.animalConfig.scale.cow);
-            this.cows.push(cow);
+            const cow = new Cow(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.cow, this.soundConfig)
+            if (cow.model) cow.model.scale.setScalar(this.animalConfig.scale.cow)
+            this.cows.push(cow)
         }
         // Birds (không kiểm tra độ phẳng)
         for (let i = 0; i < this.animalConfig.number.bird; i++) {
-            const range = this.animalConfig.spawnRange.bird;
-            let x, z, y;
-            let found = false;
+            const range = this.animalConfig.spawnRange.bird
+            let x, z, y
+            let found = false
             for (let attempt = 0; attempt < MAX_SPAWN_ATTEMPTS_PER_ANIMAL; attempt++) {
-                x = (Math.random() - 0.5) * range * 2;
-                z = (Math.random() - 0.5) * range * 2;
+                x = (Math.random() - 0.5) * range * 2
+                z = (Math.random() - 0.5) * range * 2
                 if (this.isFarFromOthers(x, z, this.birds, minDistance)) {
-                    found = true;
-                    break;
+                    found = true
+                    break
                 }
             }
-            y = this.terrainHelper.getElevation(x, z, elevationIterations) + 40;
+            y = this.terrainHelper.getElevation(x, z, elevationIterations) + 40
             if (!found) {
                 console.warn(`[View.js] Could not find a non-overlapping spot for Bird after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
-            const bird = new Bird(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.bird, this.soundConfig);
-            if (bird.model) bird.model.scale.setScalar(this.animalConfig.scale.bird);
-            this.birds.push(bird);
+            const bird = new Bird(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.bird, this.soundConfig)
+            if (bird.model) bird.model.scale.setScalar(this.animalConfig.scale.bird)
+            this.birds.push(bird)
         }
         // Wolfs
         for (let i = 0; i < this.animalConfig.number.wolf; i++) {
@@ -2063,9 +2062,9 @@ export default class View
             if (!found) {
                 console.warn(`[View.js] Could not find a flat spot for Wolf after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
-            const wolf = new Wolf(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.wolf, this.soundConfig);
-            if (wolf.model) wolf.model.scale.setScalar(this.animalConfig.scale.wolf);
-            this.wolves.push(wolf);
+            const wolf = new Wolf(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.wolf, this.soundConfig)
+            if (wolf.model) wolf.model.scale.setScalar(this.animalConfig.scale.wolf)
+            this.wolves.push(wolf)
         }
         // Stags
         for (let i = 0; i < this.animalConfig.number.stag; i++) {
@@ -2088,12 +2087,12 @@ export default class View
                 console.warn(`[View.js] Could not find a flat spot for Stag after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
             try {
-                const stag = new Stag(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.stag, this.soundConfig);
-                if (stag.model) stag.model.scale.setScalar(this.animalConfig.scale.stag);
-                this.stags.push(stag);
-                console.log(`[View.js] Stag ${i} created successfully`);
+                const stag = new Stag(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.stag, this.soundConfig)
+                if (stag.model) stag.model.scale.setScalar(this.animalConfig.scale.stag)
+                this.stags.push(stag)
+                console.log(`[View.js] Stag ${i} created successfully`)
             } catch (error) {
-                console.error(`[View.js] Error creating Stag ${i}:`, error);
+                console.error(`[View.js] Error creating Stag ${i}:`, error)
             }
         }
         // Horses
@@ -2117,85 +2116,85 @@ export default class View
                 console.warn(`[View.js] Could not find a flat spot for Horse after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
             try {
-                const horse = new Horse(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.horse, this.soundConfig);
-                if (horse.model) horse.model.scale.setScalar(this.animalConfig.scale.horse);
-                this.horses.push(horse);
-                console.log(`[View.js] Horse ${i} created successfully`);
+                const horse = new Horse(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.horse, this.soundConfig)
+                if (horse.model) horse.model.scale.setScalar(this.animalConfig.scale.horse)
+                this.horses.push(horse)
+                console.log(`[View.js] Horse ${i} created successfully`)
             } catch (error) {
-                console.error(`[View.js] Error creating Horse ${i}:`, error);
+                console.error(`[View.js] Error creating Horse ${i}:`, error)
             }
         }
         // Black Panthers
         for (let i = 0; i < this.animalConfig.number.blackPanther; i++) {
-            const range = this.animalConfig.spawnRange.blackPanther;
-            let x, z, y;
-            let found = false;
+            const range = this.animalConfig.spawnRange.blackPanther
+            let x, z, y
+            let found = false
             for (let attempt = 0; attempt < MAX_SPAWN_ATTEMPTS_PER_ANIMAL; attempt++) {
-                x = (Math.random() - 0.5) * range * 2;
-                z = (Math.random() - 0.5) * range * 2;
+                x = (Math.random() - 0.5) * range * 2
+                z = (Math.random() - 0.5) * range * 2
                 if (
                     this.isPositionSuitable(x, z, elevationIterations, PANTHER_FLATNESS_CHECK_DISTANCE, PANTHER_MAX_ELEVATION_DIFFERENCE) &&
                     this.isFarFromOthers(x, z, this.blackPanthers, minDistance)
                 ) {
-                    found = true;
-                    break;
+                    found = true
+                    break
                 }
             }
-            y = this.terrainHelper.getElevation(x, z, elevationIterations) + 0.5;
+            y = this.terrainHelper.getElevation(x, z, elevationIterations) + 0.5
             if (!found) {
-                console.warn(`[View.js] Could not find a flat spot for BlackPanther after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`);
+                console.warn(`[View.js] Could not find a flat spot for BlackPanther after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
-            const blackPanther = new BlackPanther(this.scene, time, new THREE.Vector3(x, y, z));
-            if (blackPanther.model) blackPanther.model.scale.setScalar(this.animalConfig.scale.blackPanther);
-            this.blackPanthers.push(blackPanther);
+            const blackPanther = new BlackPanther(this.scene, time, new THREE.Vector3(x, y, z))
+            if (blackPanther.model) blackPanther.model.scale.setScalar(this.animalConfig.scale.blackPanther)
+            this.blackPanthers.push(blackPanther)
         }
         // Deer
         for (let i = 0; i < this.animalConfig.number.deer; i++) {
-            const range = this.animalConfig.spawnRange.deer;
-            let x, z, y;
-            let found = false;
+            const range = this.animalConfig.spawnRange.deer
+            let x, z, y
+            let found = false
             for (let attempt = 0; attempt < MAX_SPAWN_ATTEMPTS_PER_ANIMAL; attempt++) {
-                x = (Math.random() - 0.5) * range * 2;
-                z = (Math.random() - 0.5) * range * 2;
+                x = (Math.random() - 0.5) * range * 2
+                z = (Math.random() - 0.5) * range * 2
                 if (
                     this.isPositionSuitable(x, z, elevationIterations, DEER_FLATNESS_CHECK_DISTANCE, DEER_MAX_ELEVATION_DIFFERENCE) &&
                     this.isFarFromOthers(x, z, this.deers, minDistance)
                 ) {
-                    found = true;
-                    break;
+                    found = true
+                    break
                 }
             }
-            y = this.terrainHelper.getElevation(x, z, elevationIterations) + 0.5;
+            y = this.terrainHelper.getElevation(x, z, elevationIterations) + 0.5
             if (!found) {
-                console.warn(`[View.js] Could not find a flat spot for Deer after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`);
+                console.warn(`[View.js] Could not find a flat spot for Deer after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
-            const deer = new Deer(this.scene, time, new THREE.Vector3(x, y, z));
-            if (deer.model) deer.model.scale.setScalar(this.animalConfig.scale.deer);
-            this.deers.push(deer);
+            const deer = new Deer(this.scene, time, new THREE.Vector3(x, y, z))
+            if (deer.model) deer.model.scale.setScalar(this.animalConfig.scale.deer)
+            this.deers.push(deer)
         }
         // Sheep
         for (let i = 0; i < this.animalConfig.number.sheep; i++) {
-            const range = this.animalConfig.spawnRange.sheep;
-            let x, z, y;
-            let found = false;
+            const range = this.animalConfig.spawnRange.sheep
+            let x, z, y
+            let found = false
             for (let attempt = 0; attempt < MAX_SPAWN_ATTEMPTS_PER_ANIMAL; attempt++) {
-                x = (Math.random() - 0.5) * range * 2;
-                z = (Math.random() - 0.5) * range * 2;
+                x = (Math.random() - 0.5) * range * 2
+                z = (Math.random() - 0.5) * range * 2
                 if (
                     this.isPositionSuitable(x, z, elevationIterations, SHEEP_FLATNESS_CHECK_DISTANCE, SHEEP_MAX_ELEVATION_DIFFERENCE) &&
                     this.isFarFromOthers(x, z, this.sheeps, minDistance)
                 ) {
-                    found = true;
-                    break;
+                    found = true
+                    break
                 }
             }
-            y = this.terrainHelper.getElevation(x, z, elevationIterations);
+            y = this.terrainHelper.getElevation(x, z, elevationIterations)
             if (!found) {
-                console.warn(`[View.js] Could not find a flat spot for Sheep after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`);
+                console.warn(`[View.js] Could not find a flat spot for Sheep after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
-            const sheep = new Sheep(this.scene, time, new THREE.Vector3(x, y, z));
-            if (sheep.model) sheep.model.scale.setScalar(this.animalConfig.scale.sheep);
-            this.sheeps.push(sheep);
+            const sheep = new Sheep(this.scene, time, new THREE.Vector3(x, y, z))
+            if (sheep.model) sheep.model.scale.setScalar(this.animalConfig.scale.sheep)
+            this.sheeps.push(sheep)
         }
     }
 }

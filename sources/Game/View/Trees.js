@@ -27,7 +27,7 @@ export default class Trees
             // Create custom shader material with fog for trees
             gltf.scene.traverse(child => {
                 if(child.isMesh && child.material) {
-                    const old = child.material;
+                    const old = child.material
                     
                     // Create custom shader material with fog support
                     child.material = new THREE.ShaderMaterial({
@@ -91,11 +91,11 @@ export default class Trees
                         `,
                         side: old.side || THREE.FrontSide,
                         transparent: old.transparent || false
-                    });
+                    })
                     
-                    child.material.needsUpdate = true;
+                    child.material.needsUpdate = true
                 }
-            });
+            })
             this.treeModel = gltf.scene
             console.log('🌳 Tree model loaded successfully with fog support!', this.treeModel)
             

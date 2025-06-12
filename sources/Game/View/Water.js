@@ -43,7 +43,7 @@ export default class Water
 
     setNormalTexture()
     {
-        const textureLoader = new THREE.TextureLoader()
+        // const textureLoader = new THREE.TextureLoader() // Unused variable removed
         // Tạo normal map đơn giản nếu không có texture
         const canvas = document.createElement('canvas')
         canvas.width = canvas.height = 256
@@ -90,8 +90,8 @@ export default class Water
                 gltf.scene.traverse((child) => {
                     console.log(`  - ${child.type}: ${child.name}`, child)
                     if (child.isMesh) {
-                        console.log(`    Geometry:`, child.geometry)
-                        console.log(`    Material:`, child.material)
+                        console.log('    Geometry:', child.geometry)
+                        console.log('    Material:', child.material)
                     }
                 })
                 
@@ -196,7 +196,7 @@ export default class Water
         oceanMesh.scale.set(chunk.size / 10, 1, chunk.size / 10) // Scale lớn hơn để dễ thấy
         
         // Debug info
-        console.log(`🌊 Creating water mesh:`, {
+        console.log('🌊 Creating water mesh:', {
             chunkId: chunk.id,
             position: { x: chunk.x, y: this.waterLevel, z: chunk.z },
             scale: chunk.size / 50,
@@ -348,7 +348,7 @@ export default class Water
     updateWaterLevel()
     {
         // Update all existing water instances
-        for (const [chunkId, oceanMesh] of this.oceanInstances) {
+        for (const [, oceanMesh] of this.oceanInstances) {
             oceanMesh.position.y = this.waterLevel
         }
     }
@@ -356,7 +356,7 @@ export default class Water
     updateExistingWaterInstances()
     {
         // Update geometry cho tất cả water instances hiện có
-        for (const [chunkId, oceanMesh] of this.oceanInstances) {
+        for (const [, oceanMesh] of this.oceanInstances) {
             const oldGeometry = oceanMesh.geometry
             oceanMesh.geometry = this.oceanGeometry
             
@@ -435,7 +435,8 @@ export default class Water
         console.log(`🌊 Debug Water Instances (${this.oceanInstances.size} total):`)
         console.log(`👤 Player position: (${playerPos[0].toFixed(2)}, ${playerPos[1].toFixed(2)}, ${playerPos[2].toFixed(2)})`)
         
-        for (const [chunkId, oceanMesh] of this.oceanInstances) {
+        let index = 0
+        for (const [, oceanMesh] of this.oceanInstances) {
             const pos = oceanMesh.position
             const scale = oceanMesh.scale
             const distance = Math.sqrt(
@@ -443,7 +444,7 @@ export default class Water
                 Math.pow(pos.z - playerPos[2], 2)
             )
             
-            console.log(`💧 Chunk ${chunkId}:`, {
+            console.log(`💧 Water Instance ${index}:`, {
                 position: `(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}, ${pos.z.toFixed(2)})`,
                 scale: `(${scale.x.toFixed(2)}, ${scale.y.toFixed(2)}, ${scale.z.toFixed(2)})`,
                 distanceFromPlayer: distance.toFixed(2),
@@ -451,13 +452,14 @@ export default class Water
                 material: oceanMesh.material ? 'OK' : 'MISSING',
                 geometry: oceanMesh.geometry ? 'OK' : 'MISSING'
             })
+            index++
         }
     }
 
     testBasicMaterial()
     {
         const playerPos = this.state.player.position.current
-        console.log(`🧪 Testing basic material at player position`)
+        console.log('🧪 Testing basic material at player position')
         
         // Tạo material đơn giản để test
         const basicMaterial = new THREE.MeshBasicMaterial({ 
@@ -558,7 +560,7 @@ export default class Water
         })
         
         // Replace material cho tất cả water instances
-        for (const [chunkId, oceanMesh] of this.oceanInstances) {
+        for (const [, oceanMesh] of this.oceanInstances) {
             oceanMesh.material = simpleMaterial
         }
         
@@ -581,7 +583,7 @@ export default class Water
         })
         
         // Replace material cho tất cả water instances
-        for (const [chunkId, oceanMesh] of this.oceanInstances) {
+        for (const [, oceanMesh] of this.oceanInstances) {
             oceanMesh.material = basicMaterial
         }
         
@@ -686,7 +688,7 @@ export default class Water
         })
         
         // Replace material cho tất cả water instances
-        for (const [chunkId, oceanMesh] of this.oceanInstances) {
+        for (const [, oceanMesh] of this.oceanInstances) {
             oceanMesh.material = advancedMaterial
         }
         

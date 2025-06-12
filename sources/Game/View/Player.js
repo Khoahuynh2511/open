@@ -69,7 +69,7 @@ export default class Player
         if (characterData.isOnlineModel || characterData.isLocalModel) {
             try {
                 console.log(`🔄 Loading model: ${characterData.name}`)
-                console.log(`📋 Model config:`, {
+                console.log('📋 Model config:', {
                     isLocalModel: characterData.isLocalModel,
                     modelPath: characterData.modelPath,
                     scale: characterData.scale,
@@ -105,11 +105,11 @@ export default class Player
                     this.helper = modelResult.object
                     this.helper.scale.set(characterData.scale.x, characterData.scale.y, characterData.scale.z)
                     
-                    console.log(`📏 Applied scale:`, characterData.scale)
-                    console.log(`📦 Model bounding box:`, new THREE.Box3().setFromObject(this.helper))
+                    console.log('📏 Applied scale:', characterData.scale)
+                    console.log('📦 Model bounding box:', new THREE.Box3().setFromObject(this.helper))
                     
                     // Debug preserveOriginalColor flag
-                    console.log(`🎨 preserveOriginalColor flag:`, characterData.preserveOriginalColor)
+                    console.log('🎨 preserveOriginalColor flag:', characterData.preserveOriginalColor)
                     
                     // Traverse through all meshes to apply color (optional)
                     if (!characterData.preserveOriginalColor) {
@@ -145,7 +145,7 @@ export default class Player
                             console.warn('Could not apply color to model:', colorError)
                         }
                     } else {
-                        console.log(`🌈 Preserving original model colors`)
+                        console.log('🌈 Preserving original model colors')
                     }
                     
                     this.group.add(this.helper)
@@ -175,7 +175,7 @@ export default class Player
             geometry = characterData.geometry()
         } else {
             // Default fallback
-            console.warn(`⚠️ No geometry found, using default capsule`)
+            console.warn('⚠️ No geometry found, using default capsule')
             geometry = new THREE.CapsuleGeometry(0.5, 0.8, 3, 16)
             geometry.translate(0, 0.9, 0)
         }
@@ -295,7 +295,7 @@ export default class Player
                     await this.changeCharacter(value)
                     console.log(`✅ Successfully changed to: ${value}`)
                 } catch (error) {
-                    console.error(`❌ Failed to change character:`, error)
+                    console.error('❌ Failed to change character:', error)
                 }
             })
         
