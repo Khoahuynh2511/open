@@ -13,7 +13,7 @@ export default class DayCycle
         this.autoUpdate = true
         this.timeProgress = 0
         this.progress = 0
-        this.duration = 15 // Seconds
+        this.duration = 100 // Seconds
 
         this.setDebug()
     }
@@ -34,7 +34,7 @@ export default class DayCycle
         if(!this.debug.active)
             return
 
-        const folder = this.debug.ui.getFolder('state/dayCycle')
+        const folder = this.debug.ui.getFolder('state/day-cycle')
 
         folder
             .add(this, 'autoUpdate')

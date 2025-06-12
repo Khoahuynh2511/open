@@ -158,7 +158,7 @@ export default class Terrains
         if(!this.debug.active)
             return
 
-        const folder = this.debug.ui.getFolder('state/terrains')
+        const folder = this.debug.ui.getFolder('state/terrain-generation')
 
         folder
             .add(this, 'subdivisions')

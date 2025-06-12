@@ -184,12 +184,12 @@ export default class Sky
             return
 
         // Sphere
-        const sphereGeometryFolder = this.debug.ui.getFolder('view/sky/sphere/geometry')
+        const sphereGeometryFolder = this.debug.ui.getFolder('rendering/sky/geometry')
 
         sphereGeometryFolder.add(this.sphere, 'widthSegments').min(4).max(512).step(1).name('widthSegments').onChange(() => { this.sphere.update() })
         sphereGeometryFolder.add(this.sphere, 'heightSegments').min(4).max(512).step(1).name('heightSegments').onChange(() => { this.sphere.update() })
 
-        const sphereMaterialFolder = this.debug.ui.getFolder('view/sky/sphere/material')
+        const sphereMaterialFolder = this.debug.ui.getFolder('rendering/sky/material')
 
         sphereMaterialFolder.add(this.sphere.material.uniforms.uAtmosphereElevation, 'value').min(0).max(5).step(0.01).name('uAtmosphereElevation')
         sphereMaterialFolder.add(this.sphere.material.uniforms.uAtmospherePower, 'value').min(0).max(20).step(1).name('uAtmospherePower')
@@ -205,7 +205,7 @@ export default class Sky
         sphereMaterialFolder.addColor(this.sphere.material.uniforms.uColorSun, 'value').name('uColorSun')
     
         // Stars
-        const starsFolder = this.debug.ui.getFolder('view/sky/stars')
+        const starsFolder = this.debug.ui.getFolder('rendering/sky/stars')
 
         starsFolder.add(this.stars, 'count').min(100).max(50000).step(100).name('count').onChange(() => { this.stars.update() })
         starsFolder.add(this.stars.material.uniforms.uSize, 'value').min(0).max(1).step(0.0001).name('uSize')

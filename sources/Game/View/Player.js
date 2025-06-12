@@ -193,6 +193,18 @@ export default class Player
         }
         
         this.helper.scale.set(characterData.scale.x, characterData.scale.y, characterData.scale.z)
+        
+        // Enable shadow casting for player
+        if (this.helper instanceof THREE.Group) {
+            this.helper.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true
+                }
+            })
+        } else if (this.helper.isMesh) {
+            this.helper.castShadow = true
+        }
+        
         this.group.add(this.helper)
     }
 
@@ -225,13 +237,13 @@ export default class Player
 
     setJumpEffects()
     {
-        // Scale animation when jumping
+        // Add effects for jumping
         this.jumpScale = {
             min: 0.9,
             max: 1.15
         }
         
-        // Tạo hiệu ứng bụi khi hạ cánh
+        // Create dust effect when landing
         this.dustGeometry = new THREE.CircleGeometry(1, 12)
         this.dustGeometry.rotateX(-Math.PI / 2)
         
@@ -257,10 +269,133 @@ export default class Player
         if(!this.debug.active)
             return
 
-        // Sphere
-        const playerFolder = this.debug.ui.getFolder('view/player')
+        // Player folder
+        const playerFolder = this.debug.ui.getFolder('rendering/player')
 
-        playerFolder.addColor(this.helper.material.uniforms.uColor, 'value')
+        // Character Model Selection
+        const characterFolder = playerFolder.addFolder('Character Model')
+        
+        // Get available characters for dropdown
+        const availableCharacters = this.getAvailableCharacters()
+        const characterOptions = {}
+        availableCharacters.forEach(char => {
+            characterOptions[char.name] = char.id
+        })
+        
+        // Current character selector
+        const characterSelector = {
+            currentCharacter: this.characterManager.getCurrentCharacterType()
+        }
+        
+        characterFolder.add(characterSelector, 'currentCharacter', characterOptions)
+            .name('Character Model')
+            .onChange(async (value) => {
+                console.log(`🔄 Switching to character: ${value}`)
+                try {
+                    await this.changeCharacter(value)
+                    console.log(`✅ Successfully changed to: ${value}`)
+                } catch (error) {
+                    console.error(`❌ Failed to change character:`, error)
+                }
+            })
+        
+        // Character Info Display
+        const characterData = this.characterManager.getCharacterData()
+        const infoDisplay = {
+            name: characterData.name,
+            type: characterData.isLocalModel ? 'Local Model' : 
+                  characterData.isOnlineModel ? 'Online Model' : 'Geometry',
+            preserveColor: characterData.preserveOriginalColor || false
+        }
+        
+        characterFolder.add(infoDisplay, 'name').name('Current Name').listen()
+        characterFolder.add(infoDisplay, 'type').name('Model Type').listen()
+        characterFolder.add(infoDisplay, 'preserveColor').name('Original Colors').listen()
+        
+        // Scale Controls
+        const scaleFolder = characterFolder.addFolder('Scale')
+        const scaleControls = {
+            x: characterData.scale.x,
+            y: characterData.scale.y,
+            z: characterData.scale.z,
+            uniform: 1.0
+        }
+        
+        scaleFolder.add(scaleControls, 'x', 0.1, 3.0, 0.1).name('Scale X').onChange((value) => {
+            if (this.helper) {
+                this.helper.scale.x = value
+                this.characterManager.getCharacterData().scale.x = value
+            }
+        })
+        
+        scaleFolder.add(scaleControls, 'y', 0.1, 3.0, 0.1).name('Scale Y').onChange((value) => {
+            if (this.helper) {
+                this.helper.scale.y = value
+                this.characterManager.getCharacterData().scale.y = value
+            }
+        })
+        
+        scaleFolder.add(scaleControls, 'z', 0.1, 3.0, 0.1).name('Scale Z').onChange((value) => {
+            if (this.helper) {
+                this.helper.scale.z = value
+                this.characterManager.getCharacterData().scale.z = value
+            }
+        })
+        
+        scaleFolder.add(scaleControls, 'uniform', 0.1, 3.0, 0.1).name('Uniform Scale').onChange((value) => {
+            scaleControls.x = value
+            scaleControls.y = value
+            scaleControls.z = value
+            if (this.helper) {
+                this.helper.scale.set(value, value, value)
+                const charData = this.characterManager.getCharacterData()
+                charData.scale.x = value
+                charData.scale.y = value
+                charData.scale.z = value
+            }
+        })
+        
+        // Color control (only for non-preserved colors)
+        if (this.helper.material && this.helper.material.uniforms && this.helper.material.uniforms.uColor) {
+            const colorFolder = characterFolder.addFolder('Color')
+            colorFolder.addColor(this.helper.material.uniforms.uColor, 'value').name('Player Color')
+        }
+        
+        // Quick Actions
+        const actionsFolder = characterFolder.addFolder('Quick Actions')
+        
+        actionsFolder.add({
+            resetScale: () => {
+                const originalData = this.characterManager.characters[this.characterManager.getCurrentCharacterType()]
+                if (originalData && this.helper) {
+                    this.helper.scale.set(originalData.scale.x, originalData.scale.y, originalData.scale.z)
+                    scaleControls.x = originalData.scale.x
+                    scaleControls.y = originalData.scale.y
+                    scaleControls.z = originalData.scale.z
+                    scaleControls.uniform = originalData.scale.x
+                }
+            }
+        }, 'resetScale').name('Reset Scale')
+        
+        actionsFolder.add({
+            reloadModel: async () => {
+                console.log('🔄 Reloading current character model...')
+                await this.createCharacterMesh()
+                console.log('✅ Model reloaded successfully')
+            }
+        }, 'reloadModel').name('Reload Model')
+        
+        // Model List Info
+        const modelListFolder = characterFolder.addFolder('Available Models')
+        availableCharacters.forEach((char, index) => {
+            const modelInfo = this.characterManager.getCharacterData(char.id)
+            const modelType = modelInfo.isLocalModel ? '📁 Local' : 
+                             modelInfo.isOnlineModel ? '🌐 Online' : '🔷 Geometry'
+            
+            modelListFolder.add({
+                info: `${modelType} - ${char.name}`
+            }, 'info').name(`${index + 1}. ${char.id}`)
+        })
     }
 
 
@@ -313,9 +448,7 @@ export default class Player
         }
         else
         {
-            // Back to normal size when not jumping
-            this.helper.scale.set(1, 1, 1)
-
+            // Về kích thước bình thường khi không nhảy
             const characterData = this.characterManager.getCharacterData()
             this.helper.scale.set(characterData.scale.x, characterData.scale.y, characterData.scale.z)
             

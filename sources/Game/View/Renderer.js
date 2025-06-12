@@ -48,8 +48,9 @@ export default class Renderer
         // this.instance.physicallyCorrectLights = true
         // this.instance.gammaOutPut = true
         // this.instance.outputEncoding = THREE.sRGBEncoding
-        // this.instance.shadowMap.type = THREE.PCFSoftShadowMap
-        // this.instance.shadowMap.enabled = false
+        // Enable shadow system (temporarily disabled)
+        this.instance.shadowMap.enabled = false
+        this.instance.shadowMap.type = THREE.PCFSoftShadowMap // Soft shadows
         // this.instance.toneMapping = THREE.ReinhardToneMapping
         // this.instance.toneMapping = THREE.ReinhardToneMapping
         // this.instance.toneMappingExposure = 1.3
@@ -75,7 +76,10 @@ export default class Renderer
         if(this.debug.stats)
             this.debug.stats.beforeRender()
 
-        this.instance.render(this.scene, this.camera.instance)
+        // Safe check before rendering
+        if (this.scene && this.camera && this.camera.instance) {
+            this.instance.render(this.scene, this.camera.instance)
+        }
 
         if(this.debug.stats)
             this.debug.stats.afterRender()

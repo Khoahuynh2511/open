@@ -20,6 +20,7 @@ export default class Terrains
         this.sky =  this.view.sky
 
         this.setGradient()
+        this.setMountainTexture()
         this.setMaterial()
         this.setDebug()
 
@@ -39,6 +40,17 @@ export default class Terrains
         this.gradient = new TerrainGradient()
     }
 
+    setMountainTexture()
+    {
+        const textureLoader = new THREE.TextureLoader()
+        this.mountainTexture = textureLoader.load('/models/terrain/mountain/ground_grass_3264_4062_Small.jpg')
+        this.mountainTexture.wrapS = THREE.RepeatWrapping
+        this.mountainTexture.wrapT = THREE.RepeatWrapping
+        this.mountainTexture.repeat.set(50, 50) // Lặp lại texture để tạo chi tiết
+        
+        console.log('🏔️ Mountain texture loaded')
+    }
+
     setMaterial()
     {
         this.material = new TerrainMaterial()
@@ -51,6 +63,9 @@ export default class Terrains
         this.material.uniforms.uSunPosition.value = new THREE.Vector3(- 0.5, - 0.5, - 0.5)
         this.material.uniforms.uFogTexture.value = this.sky.customRender.texture
         this.material.uniforms.uGrassDistance.value = this.state.chunks.minSize
+        this.material.uniforms.uMountainTexture.value = this.mountainTexture
+        this.material.uniforms.uMountainElevationThreshold.value = 8.0  // Độ cao ngưỡng để chuyển sang texture núi
+        this.material.uniforms.uMountainTransitionSmoothness.value = 3.0  // Độ mềm mại của chuyển tiếp
 
         this.material.onBeforeRender = (renderer, scene, camera, geometry, mesh) =>
         {
@@ -73,7 +88,7 @@ export default class Terrains
         if(!this.debug.active)
             return
 
-        const folder = this.debug.ui.getFolder('view/terrains')
+        const folder = this.debug.ui.getFolder('rendering/terrain')
 
         folder
             .add(this.material, 'wireframe')
@@ -105,6 +120,23 @@ export default class Terrains
             .max(10)
             .step(1)
             .name('uFresnelPower')
+
+        // Mountain controls
+        const mountainFolder = folder.addFolder('mountain')
+        
+        mountainFolder
+            .add(this.material.uniforms.uMountainElevationThreshold, 'value')
+            .min(0)
+            .max(20)
+            .step(0.5)
+            .name('elevationThreshold')
+        
+        mountainFolder
+            .add(this.material.uniforms.uMountainTransitionSmoothness, 'value')
+            .min(0.1)
+            .max(10)
+            .step(0.1)
+            .name('transitionSmoothness')
     }
 
     update()

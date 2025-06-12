@@ -100,6 +100,62 @@ export default class CharacterManager
             },
 
 
+            // Basic geometry shapes
+            sphere: {
+                name: 'Sphere Character',
+                geometry: () => {
+                    const geometry = new THREE.SphereGeometry(0.5, 16, 12)
+                    geometry.translate(0, 0.8, 0)
+                    return geometry
+                },
+                color: '#ff6b6b',
+                scale: { x: 1, y: 1, z: 1 }
+            },
+
+            cube: {
+                name: 'Cube Character',
+                geometry: () => {
+                    const geometry = new THREE.BoxGeometry(0.8, 1.2, 0.8)
+                    geometry.translate(0, 0.8, 0)
+                    return geometry
+                },
+                color: '#4ecdc4',
+                scale: { x: 1, y: 1, z: 1 }
+            },
+
+            pyramid: {
+                name: 'Pyramid Character',
+                geometry: () => {
+                    const geometry = new THREE.ConeGeometry(0.6, 1.5, 8)
+                    geometry.translate(0, 0.9, 0)
+                    return geometry
+                },
+                color: '#45b7d1',
+                scale: { x: 1, y: 1, z: 1 }
+            },
+
+            torus: {
+                name: 'Torus Character',
+                geometry: () => {
+                    const geometry = new THREE.TorusGeometry(0.6, 0.3, 8, 16)
+                    geometry.translate(0, 0.8, 0)
+                    return geometry
+                },
+                color: '#f39c12',
+                scale: { x: 1, y: 1, z: 1 }
+            },
+
+            octahedron: {
+                name: 'Diamond Character',
+                geometry: () => {
+                    const geometry = new THREE.OctahedronGeometry(0.7)
+                    geometry.translate(0, 0.8, 0)
+                    return geometry
+                },
+                color: '#9b59b6',
+                scale: { x: 1, y: 1, z: 1 }
+            },
+
             // Online models from Three.js examples
             robot_expressive: {
                 name: 'Robot',

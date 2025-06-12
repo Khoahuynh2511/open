@@ -18,6 +18,10 @@ export default class Player
         this.inputSpeed = 10
         this.inputBoostSpeed = 30
         this.speed = 0
+        
+        // Speed multiplier for turbo boost (300% = 3x speed)
+        this.speedMultiplier = 1.0
+        this.turboBoostActive = false
 
         // Jump effect
         this.jumpHeight = 5
@@ -48,6 +52,30 @@ export default class Player
             this.isJumping = true
             this.jumpTime = 0
             this.startJumpHeight = this.position.current[1]
+        }
+    }
+
+    // Turbo boost methods
+    enableTurboBoost()
+    {
+        this.turboBoostActive = true
+        this.speedMultiplier = 3.0 // 300% speed boost
+        console.log('🚀 TURBO BOOST ACTIVATED! Speed: 300%')
+    }
+
+    disableTurboBoost()
+    {
+        this.turboBoostActive = false
+        this.speedMultiplier = 1.0 // Normal speed
+        console.log('🏃 Turbo boost deactivated. Speed: Normal')
+    }
+
+    toggleTurboBoost()
+    {
+        if (this.turboBoostActive) {
+            this.disableTurboBoost()
+        } else {
+            this.enableTurboBoost()
         }
     }
 
@@ -82,7 +110,10 @@ export default class Player
                 this.rotation -= Math.PI * 0.5
             }
 
-            const speed = this.controls.keys.down.boost ? this.inputBoostSpeed : this.inputSpeed
+            let speed = this.controls.keys.down.boost ? this.inputBoostSpeed : this.inputSpeed
+            
+            // Apply speed multiplier for turbo boost
+            speed *= this.speedMultiplier
 
             const x = Math.sin(this.rotation) * this.time.delta * speed
             const z = Math.cos(this.rotation) * this.time.delta * speed
