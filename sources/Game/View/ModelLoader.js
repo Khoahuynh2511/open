@@ -1,4 +1,3 @@
-import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 export default class ModelLoader
@@ -14,20 +13,18 @@ export default class ModelLoader
     {
         const cacheKey = name || url
 
-        // Trả về model đã cache
         if (this.cache.has(cacheKey)) {
             return this.cache.get(cacheKey).clone()
         }
 
-        // Trả về promise đang load
         if (this.loadingPromises.has(cacheKey)) {
             const model = await this.loadingPromises.get(cacheKey)
             return model.clone()
         }
 
-        // Tạo promise mới để load với timeout
+        // Create new promise to load with timeout
         const loadPromise = new Promise((resolve, reject) => {
-            // Timeout sau 10 giây
+            // Timeout after 10 seconds
             const timeoutId = setTimeout(() => {
                 console.error(`⏰ Timeout loading ${cacheKey}`)
                 this.loadingPromises.delete(cacheKey)
@@ -40,7 +37,7 @@ export default class ModelLoader
                     clearTimeout(timeoutId)
                     console.log(`✅ Loaded model: ${cacheKey}`)
                     
-                    // Lấy scene hoặc object đầu tiên
+                    // Get first scene or object
                     const model = gltf.scene || gltf.scenes[0]
                     
                     if (!model) {
@@ -50,7 +47,7 @@ export default class ModelLoader
                         return
                     }
                     
-                    // Scale và position mặc định
+                    // Default scale and position
                     model.scale.set(1, 1, 1)
                     model.position.set(0, 0, 0)
                     
@@ -79,11 +76,11 @@ export default class ModelLoader
         return loadPromise
     }
 
-    // Danh sách model online miễn phí (đã test)
+    // List of online models (tested)
     getPresetModels()
     {
         return {
-            // Robot từ THREE.js examples (safe URL)
+            // Robot from THREE.js examples (safe URL)
             robot_simple: {
                 url: 'https://threejs.org/examples/models/gltf/RobotExpressive/RobotExpressive.glb',
                 name: 'Robot Biểu Cảm 🤖',
@@ -91,7 +88,7 @@ export default class ModelLoader
                 position: { x: 0, y: 0, z: 0 }
             },
 
-            // Duck từ THREE.js examples (safe backup)
+            // Duck from THREE.js examples (safe backup)
             duck: {
                 url: 'https://threejs.org/examples/models/gltf/Duck/glTF-Binary/Duck.glb',
                 name: 'Vịt Vàng 🦆',
@@ -121,7 +118,7 @@ export default class ModelLoader
 
             const model = await this.loadModel(modelConfig.url, modelKey)
             
-            // Apply scale và position từ config
+            // Apply scale and position from config
             model.scale.set(
                 modelConfig.scale.x, 
                 modelConfig.scale.y, 

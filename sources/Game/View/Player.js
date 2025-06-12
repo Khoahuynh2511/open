@@ -410,23 +410,20 @@ export default class Player
             playerState.position.current[2]
         )
         
-        // Quay model theo hướng di chuyển
+        // Rotate model according to movement direction
         if (this.helper) {
-            // Đối với model 3D GLTF, có thể cần điều chỉnh hướng
             const characterData = this.characterManager.getCharacterData()
             
             if (characterData.isLocalModel || characterData.isOnlineModel) {
-                // Sử dụng rotationOffset từ config model
+                // Use rotationOffset from model config
                 const rotationOffset = characterData.rotationOffset || Math.PI
                 this.helper.rotation.y = playerState.rotation + rotationOffset
                 // console.log(`🔄 Rotating 3D model: ${(playerState.rotation * 180 / Math.PI).toFixed(1)}° + offset: ${(rotationOffset * 180 / Math.PI).toFixed(1)}°`)
             } else {
-                // Geometry thông thường
                 this.helper.rotation.y = playerState.rotation
             }
         }
         
-        // Chỉ update material nếu không phải là 3D model
         if (this.helper.material && this.helper.material.uniforms) {
             this.helper.material.uniforms.uSunPosition.value.set(sunState.position.x, sunState.position.y, sunState.position.z)
         }
@@ -479,7 +476,7 @@ export default class Player
             }
         }
 
-        // Cập nhật hiệu ứng nhân vật đặc biệt
+
         this.characterEffects.update(this.state.time.delta, this.helper)
     }
 }

@@ -15,7 +15,6 @@ export default class CharacterUI
 
     createUI()
     {
-        // Tạo container chính
         this.container = document.createElement('div')
         this.container.id = 'character-selector'
         this.container.style.cssText = `
@@ -242,7 +241,6 @@ export default class CharacterUI
 
     showNotification(message)
     {
-        // Tạo thông báo tạm thời
         const notification = document.createElement('div')
         notification.textContent = message
         notification.style.cssText = `
@@ -260,7 +258,6 @@ export default class CharacterUI
             animation: slideIn 0.3s ease;
         `
 
-        // Thêm animation CSS
         const style = document.createElement('style')
         style.textContent = `
             @keyframes slideIn {
@@ -272,7 +269,6 @@ export default class CharacterUI
 
         document.body.appendChild(notification)
 
-        // Tự động xóa sau 2 giây
         setTimeout(() => {
             notification.remove()
             style.remove()
@@ -285,7 +281,6 @@ export default class CharacterUI
         this.toggleButton.style.display = 'none'
         this.isVisible = true
         
-        // Cập nhật selection hiện tại
         const currentType = this.player.characterManager.getCurrentCharacterType()
         this.updateSelection(currentType)
     }

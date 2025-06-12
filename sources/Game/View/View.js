@@ -31,8 +31,8 @@ const DEFAULT_FLATNESS_CHECK_DISTANCE = 1.5;
 const DEFAULT_MAX_ELEVATION_DIFFERENCE = 1.0;
 
 // Cow-specific flatness parameters
-const COW_FLATNESS_CHECK_DISTANCE = 3; // Wider check area for cows
-const COW_MAX_ELEVATION_DIFFERENCE = 0.8;  // Stricter elevation diff for cows
+const COW_FLATNESS_CHECK_DISTANCE = 3 // Wider check area for cows
+const COW_MAX_ELEVATION_DIFFERENCE = 0.8  // Stricter elevation diff for cows
 
 // Panther-specific flatness parameters (ADDED)
 const PANTHER_FLATNESS_CHECK_DISTANCE = 3;
@@ -47,8 +47,8 @@ const SHEEP_FLATNESS_CHECK_DISTANCE = 2.5;
 const SHEEP_MAX_ELEVATION_DIFFERENCE = 0.8;
 
 // Stag-specific flatness parameters
-const STAG_FLATNESS_CHECK_DISTANCE = 3;
-const STAG_MAX_ELEVATION_DIFFERENCE = 0.8;
+const STAG_FLATNESS_CHECK_DISTANCE = 3
+const STAG_MAX_ELEVATION_DIFFERENCE = 0.8
 
 // Horse-specific flatness parameters  
 const HORSE_FLATNESS_CHECK_DISTANCE = 3;
@@ -82,7 +82,7 @@ export default class View
             power: stateTerrains.power,
             elevationOffset: stateTerrains.elevationOffset,
             iterationsOffsets: stateTerrains.iterationsOffsets
-        });
+        })
 
         this.scene = new THREE.Scene()
         this.scene.userData.terrainHelper = this.terrainHelper;
@@ -98,12 +98,12 @@ export default class View
         directionalLight.position.set(5, 10, 7.5);
         this.scene.add(directionalLight);
         
-        // Thêm lighting để model GLTF không bị đen
+        // Add lighting to GLTF models
         this.setupLighting()
         
         this.camera = new Camera()
-        this.audioListener = new THREE.AudioListener();
-        this.camera.instance.add(this.audioListener);
+        this.audioListener = new THREE.AudioListener()
+        this.camera.instance.add(this.audioListener)
 
         // Đảm bảo resume audio context và start background music khi có tương tác người dùng đầu tiên
         const tryResumeAudio = () => {
@@ -120,9 +120,9 @@ export default class View
                 console.log('[View.js] Starting background music after user interaction');
                 this.playBackgroundMusic();
             }
-        };
-        window.addEventListener('pointerdown', tryResumeAudio, { once: true });
-        window.addEventListener('keydown', tryResumeAudio, { once: true });
+        }
+        window.addEventListener('pointerdown', tryResumeAudio, { once: true })
+        window.addEventListener('keydown', tryResumeAudio, { once: true })
 
         this.renderer = new Renderer()
         this.noises = new Noises()
@@ -1150,7 +1150,7 @@ export default class View
     }
 
     isPositionSuitable(x, z, elevationIterations, flatnessCheckDistance, maxElevationDifference) {
-        const centerElevation = this.terrainHelper.getElevation(x, z, elevationIterations);
+        const centerElevation = this.terrainHelper.getElevation(x, z, elevationIterations)
 
         const pointsToSample = [
             { dx: flatnessCheckDistance, dz: 0 },
@@ -1689,19 +1689,19 @@ export default class View
         scaleFolder.add(this.animalConfig.scale, 'sheep', 0.1, 5, 0.01).name('Sheep');
 
         // Apply button
-        animalsFolder.add({ apply: () => this.applyAnimalConfig() }, 'apply').name('Apply');
+        animalsFolder.add({ apply: () => this.applyAnimalConfig() }, 'apply').name('Apply')
 
         // Sound (single toggle for all animals, placed below Apply)
-        const soundFolder = animalsFolder.addFolder('sound');
-        const soundToggle = { enabled: this.animalConfig.sound.cow };
+        const soundFolder = animalsFolder.addFolder('sound')
+        const soundToggle = { enabled: this.animalConfig.sound.cow }
         soundFolder.add(soundToggle, 'enabled').name('Enable All Sounds').onChange((value) => {
             // Update all sound states
-            this.animalConfig.sound.cow = value;
-            this.animalConfig.sound.bird = value;
-            this.animalConfig.sound.wolf = value;
-            this.animalConfig.sound.stag = value;
-            this.animalConfig.sound.horse = value;
-            // Lưu vào localStorage
+            this.animalConfig.sound.cow = value
+            this.animalConfig.sound.bird = value
+            this.animalConfig.sound.wolf = value
+            this.animalConfig.sound.stag = value
+            this.animalConfig.sound.horse = value
+            // Save to localStorage
             try {
                 localStorage.setItem('globalAnimalSound', JSON.stringify(value));
             } catch (e) {}
@@ -1761,7 +1761,8 @@ export default class View
         rolloffFolder.add(this.soundConfig.rolloffFactor, 'horse', 0.5, 5, 0.1).name('Horse').onChange(() => this.applySoundConfig());
     }
 
-    applyAnimalConfig() {
+    applyAnimalConfig()
+    {
         // Remove old animals from scene
         for (const cow of this.cows) if (cow.model) this.scene.remove(cow.model);
         for (const bird of this.birds) if (bird.model) this.scene.remove(bird.model);
@@ -1781,42 +1782,42 @@ export default class View
         this.horses = [];
 
         // Spawn new animals with config
-        this.spawnAnimalsByConfig();
+        this.spawnAnimalsByConfig()
 
         // Update sound on/off for all animals
         for (const cow of this.cows) {
             if (this.animalConfig.sound.cow) {
-                cow.enableSound();
+                cow.enableSound()
             } else {
-                cow.disableSound();
+                cow.disableSound()
             }
         }
         for (const bird of this.birds) {
             if (this.animalConfig.sound.bird) {
-                bird.enableSound();
+                bird.enableSound()
             } else {
-                bird.disableSound();
+                bird.disableSound()
             }
         }
         for (const wolf of this.wolves) {
             if (this.animalConfig.sound.wolf) {
-                wolf.enableSound();
+                wolf.enableSound()
             } else {
-                wolf.disableSound();
+                wolf.disableSound()
             }
         }
         for (const stag of this.stags) {
             if (this.animalConfig.sound.stag) {
-                stag.enableSound();
+                stag.enableSound()
             } else {
-                stag.disableSound();
+                stag.disableSound()
             }
         }
         for (const horse of this.horses) {
             if (this.animalConfig.sound.horse) {
-                horse.enableSound();
+                horse.enableSound()
             } else {
-                horse.disableSound();
+                horse.disableSound()
             }
         }
         // BlackPanther, Deer, Sheep don't have sound methods - skip sound config
@@ -2006,8 +2007,8 @@ export default class View
                 x = (Math.random() - 0.5) * range * 2;
                 z = (Math.random() - 0.5) * range * 2;
                 if (
-                    this.isPositionSuitable(x, z, elevationIterations, COW_FLATNESS_CHECK_DISTANCE, COW_MAX_ELEVATION_DIFFERENCE) &&
-                    this.isFarFromOthers(x, z, this.cows, minDistance)
+                    this.isPositionSuitable(x, z, Game.getInstance().state.terrains.maxIterations, STAG_FLATNESS_CHECK_DISTANCE, STAG_MAX_ELEVATION_DIFFERENCE) &&
+                    this.isFarFromOthers(x, z, this.stags, 3)
                 ) {
                     found = true;
                     break;
@@ -2036,7 +2037,7 @@ export default class View
             }
             y = this.terrainHelper.getElevation(x, z, elevationIterations) + 40;
             if (!found) {
-                console.warn(`[View.js] Could not find a non-overlapping spot for Bird after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`);
+                console.warn(`[View.js] Could not find a non-overlapping spot for Bird after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
             const bird = new Bird(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.bird, this.soundConfig);
             if (bird.model) bird.model.scale.setScalar(this.animalConfig.scale.bird);
@@ -2044,23 +2045,23 @@ export default class View
         }
         // Wolfs
         for (let i = 0; i < this.animalConfig.number.wolf; i++) {
-            const range = this.animalConfig.spawnRange.wolf;
-            let x, z, y;
-            let found = false;
+            const range = this.animalConfig.spawnRange.wolf
+            let x, z, y
+            let found = false
             for (let attempt = 0; attempt < MAX_SPAWN_ATTEMPTS_PER_ANIMAL; attempt++) {
-                x = (Math.random() - 0.5) * range * 2;
-                z = (Math.random() - 0.5) * range * 2;
+                x = (Math.random() - 0.5) * range * 2
+                z = (Math.random() - 0.5) * range * 2
                 if (
                     this.isPositionSuitable(x, z, elevationIterations, PANTHER_FLATNESS_CHECK_DISTANCE, PANTHER_MAX_ELEVATION_DIFFERENCE) &&
                     this.isFarFromOthers(x, z, this.wolves, minDistance)
                 ) {
-                    found = true;
-                    break;
+                    found = true
+                    break
                 }
             }
-            y = this.terrainHelper.getElevation(x, z, elevationIterations) + 0.5;
+            y = this.terrainHelper.getElevation(x, z, elevationIterations) + 0.5
             if (!found) {
-                console.warn(`[View.js] Could not find a flat spot for Wolf after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`);
+                console.warn(`[View.js] Could not find a flat spot for Wolf after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
             const wolf = new Wolf(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.wolf, this.soundConfig);
             if (wolf.model) wolf.model.scale.setScalar(this.animalConfig.scale.wolf);
@@ -2068,23 +2069,23 @@ export default class View
         }
         // Stags
         for (let i = 0; i < this.animalConfig.number.stag; i++) {
-            const range = this.animalConfig.spawnRange.stag;
-            let x, z, y;
-            let found = false;
+            const range = this.animalConfig.spawnRange.stag
+            let x, z, y
+            let found = false
             for (let attempt = 0; attempt < MAX_SPAWN_ATTEMPTS_PER_ANIMAL; attempt++) {
-                x = (Math.random() - 0.5) * range * 2;
-                z = (Math.random() - 0.5) * range * 2;
+                x = (Math.random() - 0.5) * range * 2
+                z = (Math.random() - 0.5) * range * 2
                 if (
                     this.isPositionSuitable(x, z, elevationIterations, STAG_FLATNESS_CHECK_DISTANCE, STAG_MAX_ELEVATION_DIFFERENCE) &&
                     this.isFarFromOthers(x, z, this.stags, minDistance)
                 ) {
-                    found = true;
-                    break;
+                    found = true
+                    break
                 }
             }
-            y = this.terrainHelper.getElevation(x, z, elevationIterations) + 0.5;
+            y = this.terrainHelper.getElevation(x, z, elevationIterations) + 0.5
             if (!found) {
-                console.warn(`[View.js] Could not find a flat spot for Stag after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`);
+                console.warn(`[View.js] Could not find a flat spot for Stag after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
             try {
                 const stag = new Stag(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.stag, this.soundConfig);
@@ -2097,23 +2098,23 @@ export default class View
         }
         // Horses
         for (let i = 0; i < this.animalConfig.number.horse; i++) {
-            const range = this.animalConfig.spawnRange.horse;
-            let x, z, y;
-            let found = false;
+            const range = this.animalConfig.spawnRange.horse
+            let x, z, y
+            let found = false
             for (let attempt = 0; attempt < MAX_SPAWN_ATTEMPTS_PER_ANIMAL; attempt++) {
-                x = (Math.random() - 0.5) * range * 2;
-                z = (Math.random() - 0.5) * range * 2;
+                x = (Math.random() - 0.5) * range * 2
+                z = (Math.random() - 0.5) * range * 2
                 if (
                     this.isPositionSuitable(x, z, elevationIterations, HORSE_FLATNESS_CHECK_DISTANCE, HORSE_MAX_ELEVATION_DIFFERENCE) &&
                     this.isFarFromOthers(x, z, this.horses, minDistance)
                 ) {
-                    found = true;
-                    break;
+                    found = true
+                    break
                 }
             }
-            y = this.terrainHelper.getElevation(x, z, elevationIterations);
+            y = this.terrainHelper.getElevation(x, z, elevationIterations)
             if (!found) {
-                console.warn(`[View.js] Could not find a flat spot for Horse after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`);
+                console.warn(`[View.js] Could not find a flat spot for Horse after ${MAX_SPAWN_ATTEMPTS_PER_ANIMAL} attempts. Spawning at last tried location.`)
             }
             try {
                 const horse = new Horse(this.scene, time, new THREE.Vector3(x, y, z), this.audioListener, this.animalConfig.sound.horse, this.soundConfig);

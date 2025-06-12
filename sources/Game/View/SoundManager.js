@@ -133,7 +133,7 @@ export default class SoundManager
             .name('Enable sounds')
             
         // Create folder for each sound type
-        const jumpFolder = soundFolder.addFolder('Âm thanh nhảy')
+        const jumpFolder = soundFolder.addFolder('Jump sound')
         if(this.sounds.jump) {
             jumpFolder.add(this.sounds.jump.options, 'volume', 0, 1, 0.01)
                 .name('Jump volume')

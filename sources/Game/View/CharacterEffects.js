@@ -13,8 +13,7 @@ export default class CharacterEffects
     {
         this.removeEffect(characterMesh, 'aura')
 
-        // Tạm thời bỏ hiệu ứng để tránh lỗi
-        // Sẽ thêm lại khi có model
+
         console.log(`🌟 Character selected: ${characterType}`)
         
         /* 
@@ -31,7 +30,6 @@ export default class CharacterEffects
 
     createSaiyanAura(characterMesh)
     {
-        // Tạo aura vàng Super Saiyan
         const auraGeometry = new THREE.SphereGeometry(1.2, 16, 16)
         const auraMaterial = new THREE.MeshBasicMaterial({
             color: '#ffeb3b',
@@ -53,7 +51,6 @@ export default class CharacterEffects
 
     createChakraAura(characterMesh)
     {
-        // Aura chakra màu cam xoay
         const auraGeometry = new THREE.TorusGeometry(1, 0.2, 8, 16)
         const auraMaterial = new THREE.MeshBasicMaterial({
             color: '#ff5722',
@@ -74,7 +71,6 @@ export default class CharacterEffects
 
     createElectricAura(characterMesh)
     {
-        // Hiệu ứng điện quanh Pikachu
         const sparkCount = 15
         const sparkGeometry = new THREE.BufferGeometry()
         const positions = new Float32Array(sparkCount * 3)
@@ -144,7 +140,7 @@ export default class CharacterEffects
     {
         if (this.effects.has(characterMesh)) {
             const characterEffects = this.effects.get(characterMesh)
-            for (const [effectType, effectData] of characterEffects) {
+            for (const effectType of characterEffects.keys()) {
                 this.removeEffect(characterMesh, effectType)
             }
             this.effects.delete(characterMesh)
@@ -159,7 +155,7 @@ export default class CharacterEffects
         if (this.effects.has(characterMesh)) {
             const characterEffects = this.effects.get(characterMesh)
             
-            for (const [effectType, effectData] of characterEffects) {
+            for (const effectData of characterEffects.values()) {
                 this.updateEffect(effectData, characterMesh)
             }
         }
@@ -175,12 +171,13 @@ export default class CharacterEffects
         }
 
         switch(effectData.type) {
-            case 'saiyan':
+            case 'saiyan': {
                 // Pulse aura
                 const pulse = 1 + Math.sin(this.time * 3) * 0.1
                 effectData.group.scale.set(pulse, pulse, pulse)
                 effectData.group.material.opacity = 0.1 + Math.sin(this.time * 2) * 0.05
                 break
+            }
 
             case 'chakra':
                 // Rotate chakra rings
@@ -188,15 +185,16 @@ export default class CharacterEffects
                 effectData.group.rotation.x = Math.sin(this.time) * 0.2
                 break
 
-            case 'electric':
+            case 'electric': {
                 // Random spark movement
                 const positions = effectData.group.geometry.attributes.position.array
-                for(let i = 0; i < positions.length; i += 3) {
+                for (let i = 0; i < positions.length; i += 3) {
                     positions[i] += (Math.random() - 0.5) * 0.02
                     positions[i + 2] += (Math.random() - 0.5) * 0.02
                 }
                 effectData.group.geometry.attributes.position.needsUpdate = true
                 break
+            }
         }
     }
 }
