@@ -7,9 +7,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint 'sources/**/*.js' --fix",
-    "format": "prettier --write 'sources/**/*.{js,jsx,css,json,md}'",
-    "format:check": "prettier --check 'sources/**/*.{js,jsx,css,json,md}'"
+    "lint": "eslint sources/**/*.js --fix",
+    "format": "prettier --write sources/**/*.{js,jsx,css,json,md}",
+    "format:check": "prettier --check sources/**/*.{js,jsx,css,json,md}"
   },
   "author": "",
   "license": "ISC",
